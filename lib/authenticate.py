@@ -3,7 +3,7 @@ from flask import Response
 from datetime import datetime
 
 from db import db
-from models.authorizations import Auths
+from models.auth_tokens import Auths
 from models.users import Users
 
 

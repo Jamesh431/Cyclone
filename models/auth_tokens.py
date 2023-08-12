@@ -45,7 +45,7 @@ from .users import UsersSchema
 class Auths(db.Model):
     __tablename__ = "AuthTokens"
 
-    github_token = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    github_token = db.Column(db.String(), primary_key=True)
     user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("Users.user_id"), nullable=False)
 
     def __init__(self, github_token, user_id):
@@ -58,7 +58,7 @@ class Auths(db.Model):
 
 class AuthsSchema(ma.Schema):
     class Meta:
-        fields = ['auth_token', 'user_id']
+        fields = ['github_token', 'user_id']
 
         user_id = ma.fields.Nested(UsersSchema)
         # user = ma.fields.Nested(UsersSchema(only=("role", "first_name", "user_id")))

@@ -19,10 +19,10 @@ class Users(db.Model):
         return Users("", "")
 
 
-class UsersSchema(ma.Schema):
+class UserSchema(ma.Schema):
     class Meta:
         fields = ["user_id", "github_username"]
 
 
-user_schema = UsersSchema()
-user_schema = UsersSchema(many=True)
+user_schema = UserSchema()
+user_schema = UserSchema(many=True)

@@ -32,7 +32,7 @@ class Sessions(db.model):
         self.active = active
 
     def new_session():
-        return Sessions("", "", "", 1, True, "", {}, "", 0, True)
+        return Sessions("", 0, True, "", {}, "", 0, True)
 
 
 class SesssionsSchema(ma.Schema):

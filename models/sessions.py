@@ -4,8 +4,8 @@ from datetime import datetime, time
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy_utils import JSONType
 
-from models.repositories import RepositoriesSchema
 from db import db
+from models.repositories import RepoSchema
 
 
 class Sessions(db.model):
@@ -39,7 +39,7 @@ class SesssionsSchema(ma.Schema):
     class Meta:
         fields = ['session_id', 'current_repo', 'num_of_commits', 'commit_by_repo_amount', 'time_to_commit', 'time_frame', 'latest_commit', 'current_position', 'active']
 
-        current_repo = ma.fields.Nested(RepositoriesSchema)
+        current_repo = ma.fields.Nested(RepoSchema)
 
 
 session_schema = SesssionsSchema()

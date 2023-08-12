@@ -22,7 +22,7 @@ class Sessions(db.model):
     active = db.Column(db.Boolean(), default=True, nullable=False)
 
     def __init__(self, current_repo, num_of_commits, commit_by_repo_ammount, time_to_commit, time_frame, latest_commit, current_position, active):
-        self.current_position = current_position
+        self.current_repo = current_repo
         self.num_of_commits = num_of_commits
         self.commit_by_repo_ammount = commit_by_repo_ammount
         self.time_to_commit = time_to_commit

@@ -35,12 +35,12 @@ class Sessions(db.model):
         return Sessions("", 0, True, "", {}, "", 0, True)
 
 
-class SesssionsSchema(ma.Schema):
+class SesssionSchema(ma.Schema):
     class Meta:
         fields = ['session_id', 'current_repo', 'num_of_commits', 'commit_by_repo_amount', 'time_to_commit', 'time_frame', 'latest_commit', 'current_position', 'active']
 
         current_repo = ma.fields.Nested(RepoSchema)
 
 
-session_schema = SesssionsSchema()
-sessions_schema = SesssionsSchema(many=True)
+session_schema = SesssionSchema()
+sessions_schema = SesssionSchema(many=True)

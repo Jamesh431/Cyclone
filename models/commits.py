@@ -14,20 +14,19 @@ class Commits(db.Model):
     comment = db.Column(db.String(), nullable=False)
     position = db.Column(db.Integer(), nullable=False, unique=True)
 
-    def __init__(self, commit_id, repo_id, comment, position):
-        self.commit_id = commit_id
+    def __init__(self, repo_id, comment, position):
         self.repo_id = repo_id
         self.comment = comment
         self.position = position
 
     def new_commit():
-        return Commits("", "", "", 0)
+        return Commits("", "", 0)
 
 
-class UsersSchema(ma.Schema):
+class CommitSchema(ma.Schema):
     class Meta:
-        fields = ["user_id", "github_username"]
+        fields = ["commit_id", "repo_id", "comment", "position"]
 
 
-user_schema = UsersSchema()
-user_schema = UsersSchema(many=True)
+commit_schema = CommitSchema()
+commits_schema = CommitSchema(many=True)

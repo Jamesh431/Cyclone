@@ -6,6 +6,7 @@ from sqlalchemy_utils import JSONType
 
 from db import db
 from models.repositories import RepoSchema
+from user_sessions_xref import user_sessions_xref
 
 
 class Sessions(db.model):
@@ -20,6 +21,8 @@ class Sessions(db.model):
     latest_commit = db.Column(db.DateTime())
     current_position = db.Column(db.integer(), default=0, nullable=False)
     active = db.Column(db.Boolean(), default=True, nullable=False)
+
+    users = db.relationship('Users', secondary=user_sessions_xref, backpopulates='session')
 
     def __init__(self, current_repo, num_of_commits, commit_by_repo_ammount, time_to_commit, time_frame, latest_commit, current_position, active):
         self.current_repo = current_repo

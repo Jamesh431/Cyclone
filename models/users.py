@@ -3,6 +3,7 @@ import uuid
 from sqlalchemy.dialects.postgresql import UUID
 
 from db import db
+from user_sessions_xref import user_sessions_xref
 
 
 class Users(db.Model):
@@ -10,6 +11,8 @@ class Users(db.Model):
 
     user_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     github_username = db.Column(db.String(), nullable=False, unique=True)
+
+    session = db.relationship('Sessions', secondary=user_sessions_xref, backpopulates='users')
 
     def __init__(self, user_id, github_username):
         self.user_id = user_id

@@ -12,6 +12,7 @@ psycopg2 = "*"
 marshmallow = "*"
 sqlalchemy-utils = "*"
 flask-marshmallow = "*"
+marshmallow-sqlalchemy = "*"
 
 [dev-packages]
 

@@ -1,7 +1,4 @@
 from flask import request, Request, jsonify
-import uuid
-import marshmallow as ma
-from sqlalchemy.dialects.postgresql import UUID
 
 from db import db
 from models.auth_tokens import Auths, auth_schema, auths_schema

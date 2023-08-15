@@ -1,7 +1,7 @@
 from flask import jsonify
 
 
-def populate_object(obj, data_dictionary):
+def populate_obj(obj, data_dictionary):
     fields = data_dictionary.keys()
 
     for field in fields:

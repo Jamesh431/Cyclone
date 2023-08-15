@@ -13,11 +13,16 @@ def add_auth(req: Request):
 
     fields = ['github_token', 'user_id']
     req_fields = ['github_token', 'user_id']
+    missing_fields = []
 
     for field in fields:
         field_data = req_data.get(field)
-        if field_data in req_fields and not field_data:
-            return jsonify(f"{field} is required", 400)
+        if field in req_fields and not field_data:
+            missing_fields.append(field)
+
+        if len(missing_fields):
+            return jsonify(f"{missing_fields} are required", 400)
+
     new_auth = Auths.new_auth()
 
     populate_obj(new_auth, req_data)

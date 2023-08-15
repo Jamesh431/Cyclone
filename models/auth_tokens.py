@@ -39,7 +39,7 @@ import uuid
 from sqlalchemy.dialects.postgresql import UUID
 
 from db import db
-from .users import UsersSchema
+from .users import UserSchema
 
 
 class Auths(db.Model):
@@ -60,7 +60,7 @@ class AuthsSchema(ma.Schema):
     class Meta:
         fields = ['github_token', 'user_id']
 
-        user_id = ma.fields.Nested(UsersSchema)
+        user_id = ma.fields.Nested(UserSchema)
         # user = ma.fields.Nested(UsersSchema(only=("role", "first_name", "user_id")))
 
 

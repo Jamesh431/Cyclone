@@ -1,67 +1,81 @@
-import marshmallow as ma
+from flask import request, Request, jsonify
 import uuid
+import marshmallow as ma
 from sqlalchemy.dialects.postgresql import UUID
 
-# def add_exercise_type(req: Request):
-#     req_data = request.form if request.form else request.json
-
-#     fields = ['name', 'description', 'image_url']
-#     req_fields = ['name']
-
-#     for field in fields:
-#         field_data = req_data.get(field)
-#         if field_data in req_fields and not field_data:
-#             return jsonify(f'{field} is required'), 400
-
-#     new_ex_type = ExerciseTypes.new_exercise_type()
-
-#     populate_object(new_ex_type, req_data)
-
-#     db.session.add(new_ex_type)
-#     db.session.commit()
-
-#     return jsonify("Exercise Type Added"), 200
+from db import db
+from models.auth_tokens import Auths, auth_schema, auths_schema
+from util.reflection import populate_obj
 
 
-# def get_all_exercise_types(req: Request):
-#     exercise_types = db.session.query(ExerciseTypes).all()
+def add_auth(req: Request):
+    req_data = request.form if request.form else request.json
 
-#     if not exercise_types:
-#         return jsonify('No exercise types have been recorded'), 404
-#     else:
-#         return jsonify(ex_types_schema.dump(exercise_types)), 200
+    fields = ['github_token', 'user_id']
+    req_fields = ['github_token', 'user_id']
 
+    for field in fields:
+        field_data = req_data.get(field)
+        if field_data in req_fields and not field_data:
+            return jsonify(f"{field} is required", 400)
+    new_auth = Auths.new_auth()
 
-# def get_exercise_type(req: Request, id):
-#     exercise_type = db.session.query(ExerciseTypes).filter(ExerciseTypes.type_id == id).first()
+    populate_obj(new_auth, req_data)
 
-#     if not exercise_type:
-#         return jsonify('That exercise type does not exist'), 404
-#     else:
-#         return jsonify(ex_type_schema.dump(exercise_type)), 200
+    db.session.add(new_auth)
+    db.session.commit()
 
-
-# def update_exercise_type(req: Request, id):
-#     post_data = request.json
-#     if not post_data:
-#         post_data = request.form
-
-#     exercise_type = db.session.query(ExerciseTypes).filter(ExerciseTypes.type_id == id).first()
-
-#     if not exercise_type:
-#         return jsonify('That exercise type does not exist'), 404
-#     else:
-#         populate_object(exercise_type, post_data)
-#         db.session.commit()
-#         return jsonify(ex_type_schema.dump(exercise_type)), 200
+    return jsonify({"message": "auth created", "auth_info": auth_schema.dump(new_auth)}), 201
 
 
-# def delete_exercise_type(req: Request, id):
-#     exercise_type = db.session.query(ExerciseTypes).filter(ExerciseTypes.type_id == id).first()
+def get_all_auths(req: Request):
+    auths = db.session.query(Auths).all()
 
-#     if exercise_type:
-#         db.session.delete(exercise_type)
-#         db.session.commit()
-#         return jsonify(message="Exercise type has been deleted")
-#     else:
-#         return jsonify(message="Exercise type not found, unable to delete"), 404
+    if not auths:
+        return jsonify('No Auths found'), 404
+    else:
+        return jsonify(auths_schema.dump(auths)), 200
+
+
+def get_auth(req: Request, id):
+    auth = db.session.query(Auths).filter(Auths.github_token == id).first()
+
+    if not auth:
+        return jsonify('Auth not found'), 404
+    else:
+        return jsonify(auth_schema.dump(auth)), 200
+
+
+def get_auth_by_user_id(req: Request, id):
+    auth = db.session.query(Auths).filter(Auths.user_id == id).first()
+
+    if not auth:
+        return jsonify('Auth not found'), 404
+    else:
+        return jsonify(auth_schema.dump(auth)), 200
+
+
+def update_auth(req: Request, id):
+    post_data = request.json
+    if not post_data:
+        post_data = request.form
+
+    auth = db.session.query(Auths).filter(Auths.github_token == id).first()
+
+    if not auth:
+        return jsonify('Auth not found'), 404
+    else:
+        populate_obj(auth, post_data)
+        db.session.commit()
+        return jsonify(auth_schema.dump(auth)), 201
+
+
+def delete_auth(req: Request, id):
+    auth = db.session.query(Auths).filter(Auths.github_token == id).first()
+
+    if auth:
+        db.session.delete(auth)
+        db.session.commit()
+        return jsonify({"message": "Auth Deleted"}), 200
+    else:
+        return jsonify({"message": "Auth not found"}), 404

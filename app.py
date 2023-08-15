@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify
 from db import *
-import os
 from flask_marshmallow import Marshmallow
 
+import os
 from models.auth_tokens import Auths
 from models.users import Users
 from models.sessions import Sessions
@@ -12,8 +12,8 @@ from models.user_sessions_xref import user_sessions_xref
 import routes
 
 database_pre = os.environ.get("DATABASE_PRE")
-database_addr = os.environ.get("DATABASE_ADDR")
 database_user = os.environ.get("DATABASE_USER")
+database_addr = os.environ.get("DATABASE_ADDR")
 database_port = os.environ.get("DATABASE_PORT")
 database_name = os.environ.get("DATABASE_NAME")
 

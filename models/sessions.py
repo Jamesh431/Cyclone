@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime, time
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy_utils import JSONType
+from sqlalchemy_utils import ScalarListType as ListType
 
 from db import db
 from models.repositories import RepoSchema
@@ -14,6 +15,7 @@ class Sessions(db.Model):
 
     session_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     current_repo = db.Column(UUID(as_uuid=True), db.ForeignKey("Repositories.repo_id"))
+    repositories = db.Column(ListType(), nullable=False)
     num_of_commits = db.Column(db.Integer(), default=1, nullable=False)
     commit_by_repo_ammount = db.Column(db.Boolean(), default=True, nullable=False)  # committing by a num of repos or a num of commits
     time_to_commit = db.Column(db.Time())  # default=datetime.combine(datetime.min, time(8, 17)
@@ -24,9 +26,10 @@ class Sessions(db.Model):
 
     users = db.relationship('Users', secondary=user_sessions_xref, back_populates='session')
 
-    def __init__(self, current_repo, num_of_commits, commit_by_repo_ammount, time_to_commit, time_frame, latest_commit, current_position, active):
+    def __init__(self, current_repo, repositories, num_of_commits, commit_by_repo_ammount, time_to_commit, time_frame, latest_commit, current_position, active):
         self.current_repo = current_repo
         self.num_of_commits = num_of_commits
+        self.repositories = repositories
         self.commit_by_repo_ammount = commit_by_repo_ammount
         self.time_to_commit = time_to_commit
         self.time_frame = time_frame
@@ -35,12 +38,12 @@ class Sessions(db.Model):
         self.active = active
 
     def new_session():
-        return Sessions("", 0, True, "", {}, "", 0, True)
+        return Sessions("", [], 0, True, "", {}, "", 0, True)
 
 
 class SesssionSchema(ma.Schema):
     class Meta:
-        fields = ['session_id', 'current_repo', 'num_of_commits', 'commit_by_repo_amount', 'time_to_commit', 'time_frame', 'latest_commit', 'current_position', 'active']
+        fields = ['session_id', 'current_repo', 'repositories', 'num_of_commits', 'commit_by_repo_amount', 'time_to_commit', 'time_frame', 'latest_commit', 'current_position', 'active']
 
         current_repo = ma.fields.Nested(RepoSchema)
 

@@ -1,8 +1,5 @@
-# use response 202 for successful session creation
+# use response 202 for successful session creation if start time is not now ?
 from flask import request, Request, jsonify
-import uuid
-import marshmallow as ma
-from sqlalchemy.dialects.postgresql import UUID
 
 from db import db
 from models.sessions import Sessions, session_schema, sessions_schema
@@ -55,10 +52,8 @@ def get_session(req: Request, id):
         return jsonify(session_schema.dump(session)), 200
 
 
-def get_sessions_by_user_id(req: Request, id, only_active):
-
-    user = db.session.query(Users).filter(Users.user_id == id).first()
-
+def get_sessions_by_user_id(req: Request, user_id, only_active):
+    user = db.session.query(Users).filter(Users.user_id == user_id).first()
     sessions = user_schema.dump(user).get("session", [])
 
     if not sessions:
@@ -69,10 +64,14 @@ def get_sessions_by_user_id(req: Request, id, only_active):
         else:
             users_sessions = [user_session for user_session in sessions if user_session.get("active", True)]
 
-            # returned_sessions = []
+            grouped_sessions = []
             # include loop here that will loop through user sessions ids, gather all data for each of those sessions then return them below
+            for session_id in users_sessions:
+                session_query = db.session.query(Sessions).filter(Sessions.session_id == session_id).first()
+                session_iteration = session_schema.dump(session_query).first()
+                grouped_sessions.append(session_iteration)
 
-    return jsonify(message="sessions found", sessions=users_sessions), 200
+    return jsonify(message="sessions found", sessions=grouped_sessions), 200
 
 
 def get_sessions_by_current_repo_id(req: Request, id):

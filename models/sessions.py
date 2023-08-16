@@ -7,7 +7,7 @@ from sqlalchemy_utils import ScalarListType as ListType
 
 from db import db
 from models.repositories import RepoSchema
-from models.user_sessions_xref import user_sessions_xref
+# from models.user_sessions_xref import user_sessions_xref
 
 
 class Sessions(db.Model):
@@ -24,7 +24,7 @@ class Sessions(db.Model):
     current_position = db.Column(db.Integer(), default=0, nullable=False)
     active = db.Column(db.Boolean(), default=True, nullable=False)
 
-    users = db.relationship('Users', secondary=user_sessions_xref, back_populates='session')
+    users = db.relationship('Users', secondary="UserSessionsXref", back_populates='session')
 
     def __init__(self, current_repo, repositories, num_of_commits, commit_by_repo_ammount, time_to_commit, time_frame, latest_commit, current_position, active):
         self.current_repo = current_repo

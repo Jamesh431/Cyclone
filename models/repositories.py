@@ -4,19 +4,19 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy_utils import ScalarListType as ListType
 
 from db import db
-from models.users import UserSchema
+from .users import UserSchema
 
 
 class Repositories(db.Model):
     __tablename__ = "Repositories"
 
     repo_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("Users.user_id"), nullable=False)
+    sender_id = db.Column(UUID(as_uuid=True), db.ForeignKey("Users.user_id"), nullable=False)
     name = db.Column(db.String(), nullable=False)
     branches = db.Column(ListType())
 
-    def __init__(self, user_id, name, branches):
-        self.user_id = user_id
+    def __init__(self, sender_id, name, branches):
+        self.sender_id = sender_id
         self.name = name
         self.branches = branches
 
@@ -26,7 +26,7 @@ class Repositories(db.Model):
 
 class RepoSchema(ma.Schema):
     class Meta:
-        fields = ['repo_id', 'user_id', 'name', 'branches']
+        fields = ['repo_id', 'sender_id', 'name', 'branches']
 
         user_id = ma.fields.Nested(UserSchema)
 

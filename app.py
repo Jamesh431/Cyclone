@@ -33,7 +33,8 @@ def create_all():
         db.create_all()
         print("Tables created")
 
-# app.register_blueprint(routes.)
+
+app.register_blueprint(routes.users)
 # app.register_blueprint(routes.)
 # app.register_blueprint(routes.)
 # app.register_blueprint(routes.)

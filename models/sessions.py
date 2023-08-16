@@ -6,8 +6,8 @@ from sqlalchemy_utils import JSONType
 from sqlalchemy_utils import ScalarListType as ListType
 
 from db import db
-from models.repositories import RepoSchema
-# from models.user_sessions_xref import user_sessions_xref
+from .repositories import RepoSchema
+# from .users import UserSchema
 
 
 class Sessions(db.Model):

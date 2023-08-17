@@ -18,7 +18,6 @@ class Sessions(db.Model):
     repositories = db.Column(ListType(), nullable=False)
     num_of_commits = db.Column(db.Integer(), default=1, nullable=False)
     commit_by_repo_ammount = db.Column(db.Boolean(), default=True, nullable=False)  # committing by a num of repos or a num of commits
-    time_to_commit = db.Column(db.Time())  # default=datetime.combine(datetime.min, time(8, 17)
     time_frame = db.Column(JSONType(), default={"8:17": "8:17"}, nullable=False)
     latest_commit = db.Column(db.DateTime())
     current_position = db.Column(db.Integer(), default=0, nullable=False)

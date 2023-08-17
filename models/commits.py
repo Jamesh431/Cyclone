@@ -12,7 +12,7 @@ class Commits(db.Model):
     commit_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     repo_id = db.Column(db.String(), nullable=False, unique=True)
     comment = db.Column(db.String(), nullable=False)
-    position = db.Column(db.Integer(), nullable=False, unique=True)
+    position = db.Column(db.Integer(), nullable=False, unique=True, default=0)
 
     def __init__(self, repo_id, comment, position):
         self.repo_id = repo_id

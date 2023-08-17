@@ -35,8 +35,8 @@ def create_all():
 
 
 app.register_blueprint(routes.users)
-# app.register_blueprint(routes.)
-# app.register_blueprint(routes.)
+app.register_blueprint(routes.repositories)
+app.register_blueprint(routes.sessions)
 # app.register_blueprint(routes.)
 # app.register_blueprint(routes.)
 

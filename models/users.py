@@ -15,7 +15,7 @@ class Users(db.Model):
     session = db.relationship(
         'Sessions',
         secondary=user_sessions_xref,
-        back_populates='user'
+        back_populates='users'
     )
 
     def __init__(self, github_username):

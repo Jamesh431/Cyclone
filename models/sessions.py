@@ -24,7 +24,7 @@ class Sessions(db.Model):
     current_position = db.Column(db.Integer(), default=0, nullable=False)
     active = db.Column(db.Boolean(), default=True, nullable=False)
 
-    user = db.relationship('Users', secondary=user_sessions_xref, back_populates='session')
+    users = db.relationship('Users', secondary=user_sessions_xref, back_populates='session')
 
     def __init__(self, current_repo, repositories, num_of_commits, commit_by_repo_ammount, time_frame, current_position, active):
         self.current_repo = current_repo
@@ -39,13 +39,13 @@ class Sessions(db.Model):
         return Sessions("", [], 0, True, {}, 0, True)
 
 
-class SesssionSchema(ma.Schema):
+class SessionSchema(ma.Schema):
     class Meta:
-        fields = ['session_id', 'current_repo', 'repositories', 'num_of_commits', 'commit_by_repo_amount', 'time_to_commit', 'time_frame', 'latest_commit', 'current_position', 'active', "user"]
+        fields = ['session_id', 'current_repo', 'repositories', 'num_of_commits', 'commit_by_repo_amount', 'time_to_commit', 'time_frame', 'latest_commit', 'current_position', 'active', "users"]
 
         current_repo = ma.fields.Nested(RepoSchema)
-        user = ma.fields.Nested("Users", only=["user_id", "github_username"])
+        users = ma.fields.Nested("Users", many=True, exclude=['session'])
 
 
-session_schema = SesssionSchema()
-sessions_schema = SesssionSchema(many=True)
+session_schema = SessionSchema()
+sessions_schema = SessionSchema(many=True)

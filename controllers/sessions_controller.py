@@ -4,20 +4,29 @@ from sqlalchemy.orm import aliased
 
 from db import db
 from models.sessions import Sessions, session_schema, sessions_schema
+from models.users import Users
 from models.user_sessions_xref import user_sessions_xref
 from util.reflection import populate_obj
 
 
 def add_session(req: Request):
-    req_data = request.form if request.form else request.json
+    post_data = request.form if request.form else request.json
 
-    fields = ["current_repo", "repositories", "num_of_commits", "commit_by_repo_ammount", "time_to_commit", "time_frame", "latest_commit", "current_position", "active", "user"]
+    fields = ["current_repo", "repositories", "num_of_commits", "commit_by_repo_ammount", "time_to_commit", "time_frame", "latest_commit", "current_position", "active"]
 
-    req_fields = ["current_repo", "repositories", "num_of_commits", "commit_by_repo_ammount", "time_frame", "current_position", "active", "user"]
+    req_fields = ["current_repo", "repositories", "num_of_commits", "commit_by_repo_ammount", "time_frame", "current_position", "active"]
+    receiver_id = None
+    user = None
+    if "user_id" in post_data:
+        receiver_id = post_data.get("user_id")
+        user = db.session.query(Users).filter(Users.user_id == receiver_id).first()
+
+        if not user:
+            return jsonify(f"User not found: {receiver_id}", 404)
 
     missing_fields = []
     for field in fields:
-        field_data = req_data.get(field)
+        field_data = post_data.get(field)
         if field_data in req_fields and not field_data:
             missing_fields.append(field)
 
@@ -25,14 +34,28 @@ def add_session(req: Request):
             return jsonify(f"{missing_fields} are required", 400)
 
     new_session = Sessions.new_session()
-    # print(req_data)
 
-    populate_obj(new_session, req_data)
+    populate_obj(new_session, post_data)
 
     db.session.add(new_session)
+    if receiver_id:
+        # user_object = db.session.get(Users, receiver_id)
+        print(added_session)
+        added_session.users.append(user)
     db.session.commit()
 
-    return jsonify({"message": "session created", "session info": session_schema.dump(new_session)}), 201
+    return jsonify(session_schema.dump(new_session))
+
+    # session_data = session_schema.dump(new_session)
+
+    # if receiver_id:
+    #     fetched_session = db.session.query(Sessions).filter(Sessions.session_id == session_data.session_id)
+
+    #     fetched_session.user.append(user_query)
+
+    #     populate_obj(fetched_session, post_data)
+
+    # return jsonify({"message": "session created", "session info": session_data}), 201
 
 
 def get_all_sessions(req: Request):

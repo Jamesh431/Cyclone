@@ -12,9 +12,9 @@ from util.reflection import populate_obj
 def add_session(req: Request):
     post_data = request.form if request.form else request.json
 
-    fields = ["current_repo", "repositories", "num_of_commits", "commit_by_repo_ammount", "time_to_commit", "time_frame", "latest_commit", "current_position", "active"]
+    fields = ["current_repo_id", "repositories", "num_of_commits", "commit_by_repo_amount", "time_to_commit", "time_frame", "latest_commit", "current_position", "active"]
 
-    req_fields = ["current_repo", "repositories", "num_of_commits", "commit_by_repo_ammount", "time_frame", "current_position", "active"]
+    req_fields = ["current_repo_id", "repositories", "num_of_commits", "commit_by_repo_amount", "time_frame", "current_position", "active"]
     receiver_id = None
     user = None
     if "user_id" in post_data:
@@ -33,18 +33,19 @@ def add_session(req: Request):
         if len(missing_fields):
             return jsonify(f"{missing_fields} are required", 400)
 
-    new_session = Sessions.new_session()
-
+    new_session = Sessions.create_session()
+    print(new_session)
     populate_obj(new_session, post_data)
 
     db.session.add(new_session)
-    if receiver_id:
-        # user_object = db.session.get(Users, receiver_id)
-        print(added_session)
-        added_session.users.append(user)
+
     db.session.commit()
 
-    return jsonify(session_schema.dump(new_session))
+    new_session.users.append(user)
+    print(new_session.users)
+    db.session.commit()
+
+    # jsonify(session_schema.dump(new_session))
 
     # session_data = session_schema.dump(new_session)
 
@@ -55,16 +56,16 @@ def add_session(req: Request):
 
     #     populate_obj(fetched_session, post_data)
 
-    # return jsonify({"message": "session created", "session info": session_data}), 201
+    return jsonify({"message": "session created", "session_info": session_schema.dump(new_session)}), 201
 
 
 def get_all_sessions(req: Request):
-    session = db.session.query(Sessions).all()
+    sessions = db.session.query(Sessions).all()
 
-    if not Sessions:
+    if not sessions:
         return jsonify('No Sessions found'), 404
     else:
-        return jsonify(sessions_schema.dump(session)), 200
+        return jsonify(sessions_schema.dump(sessions)), 200
 
 
 def get_session(req: Request, id):
@@ -94,10 +95,11 @@ def get_session(req: Request, id):
 
 def get_sessions_by_user_id(req: Request, user_id, show_all):
 
-    xref_alias = aliased(user_sessions_xref)
+    # xref_alias = aliased(user_sessions_xref)
 
-    all_users_sessions = db.session.query(Sessions).join(xref_alias, Sessions.session_id == xref_alias.c.session_id).filter(xref_alias.c.receiver_id == user_id).all()
-
+    # all_users_sessions = db.session.query(Sessions).join(xref_alias, Sessions.session_id == xref_alias.c.session_id).filter(xref_alias.c.receiver_id == user_id).all()
+    all_users_sessions = db.session.query(Sessions).join(user_sessions_xref).filter(user_sessions_xref.columns.receiver_id == user_id).all()
+    users_sessions = all_users_sessions
     # sessions = sessions_schema.dump(query)
 
     # user = db.session.query(Users).filter(Users.user_id == user_id).first()
@@ -106,14 +108,10 @@ def get_sessions_by_user_id(req: Request, user_id, show_all):
     if not all_users_sessions:
         return jsonify('Sessions not found'), 404
     else:
-        if show_all:
-            users_sessions = all_users_sessions
-        else:
+        if not show_all:
             users_sessions = [user_session for user_session in all_users_sessions if user_session.get("active", True)]
 
-    sessions = sessions_schema.dump(users_sessions)
-
-    return jsonify(message="sessions found", all_sessions=sessions), 200
+    return jsonify({"message": "sessions found", "all_sessions": sessions_schema.dump(users_sessions)}), 200
 
     #         grouped_sessions = []
     #         # include loop here that will loop through user sessions ids, gather all data for each of those sessions then return them below

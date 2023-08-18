@@ -12,6 +12,7 @@ class Sessions(db.Model):
     __tablename__ = "Sessions"
 
     session_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    receiving_user = db.Column(UUID(as_uuid=True), db.ForeignKey("Users.user_id"), nullable=False)
     name = db.Column(db.String(), nullable=False)
     current_repo_id = db.Column(UUID(as_uuid=True), db.ForeignKey("Repositories.repo_id"))
     num_of_commits = db.Column(db.Integer(), default=1, nullable=False)
@@ -22,7 +23,6 @@ class Sessions(db.Model):
     active = db.Column(db.Boolean(), default=True, nullable=False)
 
     assigned_repos = db.relationship('Repositories', secondary=session_repo_xref, back_populates='assigned_sessions')
-    # users = db.relationship('Users', secondary=user_sessions_xref, back_populates='sessions', lazy='dynamic')
 
     def __init__(self, name, current_repo, num_of_commits, commit_by_repo_amount, time_frame, current_position, active):
         self.name = name

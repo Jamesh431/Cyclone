@@ -154,3 +154,16 @@ def delete_session(req: Request, id):
         return jsonify({"message": "Session Deleted"}), 200
     else:
         return jsonify({"message": "Session not found"}), 404
+
+
+def task_activity(req: Request, id) -> Reponse:
+    session = db.session.query(Sessions).filter(Sessions.session_id == id).first()
+
+    if not session:
+        return jsonify({"message": "Session not found"}), 404
+
+    session.active = not session.active
+
+    db.session.commit()
+
+    return jsonify({"message": "session updated", "session": session_schema.dump(session)}), 200

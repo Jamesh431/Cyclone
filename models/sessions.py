@@ -24,7 +24,8 @@ class Sessions(db.Model):
 
     assigned_repos = db.relationship('Repositories', secondary=session_repo_xref, back_populates='assigned_sessions')
 
-    def __init__(self, name, current_repo, num_of_commits, commit_by_repo_amount, time_frame, current_position, active):
+    def __init__(self, receiving_user, name, current_repo, num_of_commits, commit_by_repo_amount, time_frame, current_position, active):
+        self.receiving_user = receiving_user
         self.name = name
         self.current_repo = current_repo
         self.num_of_commits = num_of_commits
@@ -32,6 +33,9 @@ class Sessions(db.Model):
         self.time_frame = time_frame
         self.current_position = current_position
         self.active = active
+
+    def new_session():
+        return Sessions("", "", "", 0, True, {}, 0, True)
 
     # @classmethod
     # def create_session(cls):

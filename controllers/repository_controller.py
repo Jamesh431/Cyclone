@@ -9,7 +9,6 @@ def add_repository(req: Request):
     req_data = request.form if request.form else request.json
     fields = ["sender_id", "name", "branches"]
     req_fields = ["sender_id", "name"]
-
     missing_fields = []
 
     for field in fields:

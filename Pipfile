@@ -5,14 +5,15 @@ name = "pypi"
 
 [packages]
 pip = "*"
-flask = "*"
-flask-sqlalchemy = "*"
-sqlalchemy = "*"
+flask = "==1.1.4"
+Flask-SQLalchemy = "==2.4.4"
+sqlalchemy = "==1.3.23"
 marshmallow = "==3.10.0"
 psycopg2 = "*"
 sqlalchemy-utils = "*"
-flask-marshmallow = "*"
-marshmallow-sqlalchemy = "*"
+flask-marshmallow = "==0.14.0"
+marshmallow-sqlalchemy = "==0.24.2"
+MarkupSafe = "==1.1.1"
 
 [dev-packages]
 

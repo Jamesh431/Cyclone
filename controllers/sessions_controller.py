@@ -20,6 +20,7 @@ def add_session(req: Request):
     if "assigned_repos" in post_data:
         assigned_repos = post_data.get("assigned_repos")
         repo = db.session.query(Repositories).filter(Repositories.repo_id == assigned_repos).first()
+        print(assigned_repos)
 
         if not repo:
             return jsonify(f"Repo not found: {assigned_repos}", 404)
@@ -33,7 +34,7 @@ def add_session(req: Request):
         if len(missing_fields):
             return jsonify(f"{missing_fields} are required", 400)
 
-    new_session = Sessions.create_session()
+    new_session = Sessions.new_session()
     print(new_session)
     populate_obj(new_session, post_data)
 
@@ -130,13 +131,18 @@ def update_session(req: Request, id):
         post_data = request.form
 
     session = db.session.query(Sessions).filter(Sessions.session_id == id).first()
+    assigned_repo = post_data.get("assigned_repos")
 
     if not session:
         return jsonify('Session not found'), 404
-    else:
-        populate_obj(session, post_data)
-        db.session.commit()
-        return jsonify(session_schema.dump(session)), 201
+
+    if assigned_repo:
+        repo_query = db.session.query(Repositories).filter(Repositories.repo_id == assigned_repo).first
+        session.assigned_repos.append(repo_query)
+
+    populate_obj(session, post_data)
+    db.session.commit()
+    return jsonify(session_schema.dump(session)), 201
 
 
 def delete_session(req: Request, id):

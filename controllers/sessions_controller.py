@@ -4,7 +4,7 @@ from sqlalchemy.orm import aliased
 
 from db import db
 from models.sessions import Sessions, session_schema, sessions_schema
-from models.users import Users, user_schema
+from models.repositories import Repositories, repos_schema
 from models.user_sessions_xref import user_sessions_xref
 from util.reflection import populate_obj
 
@@ -15,14 +15,14 @@ def add_session(req: Request):
     fields = ["current_repo_id", "repositories", "num_of_commits", "commit_by_repo_amount", "time_to_commit", "time_frame", "latest_commit", "current_position", "active"]
 
     req_fields = ["current_repo_id", "repositories", "num_of_commits", "commit_by_repo_amount", "time_frame", "current_position", "active"]
-    receiver_id = None
-    user = None
-    if "user_id" in post_data:
-        receiver_id = post_data.get("user_id")
-        user = db.session.query(Users).filter(Users.user_id == receiver_id).first()
+    assigned_repos = None
+    repo = None
+    if "assigned_repos" in post_data:
+        assigned_repos = post_data.get("assigned_repos")
+        repo = db.session.query(Repositories).filter(Repositories.repo_id == assigned_repos).first()
 
-        if not user:
-            return jsonify(f"User not found: {receiver_id}", 404)
+        if not repo:
+            return jsonify(f"Repo not found: {assigned_repos}", 404)
 
     missing_fields = []
     for field in fields:
@@ -38,16 +38,6 @@ def add_session(req: Request):
     populate_obj(new_session, post_data)
 
     db.session.add(new_session)
-<<<<<<< HEAD
-
-    db.session.commit()
-
-    new_session.users.append(user)
-    print(new_session.users)
-    db.session.commit()
-
-    # jsonify(session_schema.dump(new_session))
-=======
     # if receiver_id:
     # user_object = db.session.get(Users, receiver_id)
     # print(user)
@@ -57,25 +47,20 @@ def add_session(req: Request):
     db.session.commit()
 
     # return jsonify(session_schema.dump(new_session))
->>>>>>> main
 
     session_data = session_schema.dump(new_session)
     print(session_data)
 
-    if receiver_id:
+    if repo:
         fetched_session = db.session.query(Sessions).filter(Sessions.session_id == session_data['session_id']).first()
 
         print(fetched_session)
 
-        fetched_session.users.append(user)
+        fetched_session.assigned_repos.append(repo)
 
-<<<<<<< HEAD
-    return jsonify({"message": "session created", "session_info": session_schema.dump(new_session)}), 201
-=======
         session_data = fetched_session
 
     return jsonify({"message": "session created", "session info": session_data}), 201
->>>>>>> main
 
 
 def get_all_sessions(req: Request):

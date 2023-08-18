@@ -156,7 +156,7 @@ def delete_session(req: Request, id):
         return jsonify({"message": "Session not found"}), 404
 
 
-def task_activity(req: Request, id) -> Reponse:
+def task_activity(req: Request, id):
     session = db.session.query(Sessions).filter(Sessions.session_id == id).first()
 
     if not session:

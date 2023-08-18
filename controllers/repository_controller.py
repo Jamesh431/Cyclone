@@ -27,4 +27,4 @@ def add_repository(req: Request):
     db.session.add(new_repository)
     db.session.commit()
 
-    return jsonify({"message": "repository created", "repository info": repo_schema.dump(new_repository)}), 201
+    return jsonify({"message": "repository created", "repository_info": repo_schema.dump(new_repository)}), 201

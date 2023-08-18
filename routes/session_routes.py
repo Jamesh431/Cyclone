@@ -15,6 +15,11 @@ def get_sessions_by_user_id(user_id, show_all) -> Response:
     return controller.get_sessions_by_user_id(request, user_id, show_all)
 
 
+@sessions.route('/sessions', methods=["GET"])
+def get_all_sessions() -> Response:
+    return controller.get_all_sessions(request)
+
+
 @sessions.route('/session/<id>', methods=["PATCH"])
 def update_session(id) -> Response:
     return controller.update_session(request, id)

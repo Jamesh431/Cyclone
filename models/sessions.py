@@ -8,43 +8,49 @@ from sqlalchemy_utils import ScalarListType as ListType
 from db import db
 from .repositories import RepoSchema
 from .user_sessions_xref import user_sessions_xref
-# from .users import UserSchema
+from .users import UserSchema
 
 
 class Sessions(db.Model):
     __tablename__ = "Sessions"
 
     session_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    current_repo = db.Column(UUID(as_uuid=True), db.ForeignKey("Repositories.repo_id"))
+    current_repo_id = db.Column(UUID(as_uuid=True), db.ForeignKey("Repositories.repo_id"))
     repositories = db.Column(ListType(), nullable=False)
     num_of_commits = db.Column(db.Integer(), default=1, nullable=False)
-    commit_by_repo_ammount = db.Column(db.Boolean(), default=True, nullable=False)  # committing by a num of repos or a num of commits
+    commit_by_repo_amount = db.Column(db.Boolean(), default=True, nullable=False)  # committing by a num of repos or a num of commits
     time_frame = db.Column(JSONType(), default={"8:17": "8:17"}, nullable=False)
     latest_commit = db.Column(db.DateTime, default=datetime.utcnow)
     current_position = db.Column(db.Integer(), default=0, nullable=False)
     active = db.Column(db.Boolean(), default=True, nullable=False)
 
-    users = db.relationship('Users', secondary=user_sessions_xref, back_populates='session')
+    users = db.relationship('Users', secondary=user_sessions_xref, back_populates='sessions', lazy='dynamic')
 
-    def __init__(self, current_repo, repositories, num_of_commits, commit_by_repo_ammount, time_frame, current_position, active):
+    def __init__(self, current_repo, repositories, num_of_commits, commit_by_repo_amount, time_frame, current_position, active):
         self.current_repo = current_repo
         self.repositories = repositories
         self.num_of_commits = num_of_commits
-        self.commit_by_repo_ammount = commit_by_repo_ammount
+        self.commit_by_repo_amount = commit_by_repo_amount
         self.time_frame = time_frame
         self.current_position = current_position
-        self.active = active
+        self.active = active if active else True
 
-    def new_session():
-        return Sessions("", [], 0, True, {}, 0, True)
+    @classmethod
+    def create_session(cls):
+        return Sessions(None, [], 0, True, {}, 0, True)
+
+    def __repr__(self):
+        for user in self.users:
+            print(f'    {user.user_id} : {user.github_username}')
+
+        return (f"Session Object: \n  session_id: {self.session_id}\n  current_repo: {self.current_repo}\n  repositories: {self.repositories}\n  num_of_commits: {self.num_of_commits}\n  commit_by_repo_ammount: {self.commit_by_repo_amount}\n  time_frame: {self.time_frame}\n  latest_commit: {self.latest_commit}\n  current_position: {self.current_position}\n  active: {self.active}\n  Users:")
 
 
 class SessionSchema(ma.Schema):
     class Meta:
-        fields = ['session_id', 'current_repo', 'repositories', 'num_of_commits', 'commit_by_repo_amount', 'time_to_commit', 'time_frame', 'latest_commit', 'current_position', 'active', "users"]
+        fields = ['session_id', 'current_repo_id', 'repositories', 'num_of_commits', 'commit_by_repo_amount', 'time_frame', 'latest_commit', 'current_position', 'active', 'users']
 
-        current_repo = ma.fields.Nested(RepoSchema)
-        users = ma.fields.Nested("Users", many=True, exclude=['session'])
+        users = ma.fields.Nested('UserSchema', many=True, only=['user_id', 'github_username'])
 
 
 session_schema = SessionSchema()

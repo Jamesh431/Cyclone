@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy.dialects.postgresql import UUID
 
 from db import db
-from .user_sessions_xref import user_sessions_xref
+# from .user_sessions_xref import user_sessions_xref
 
 
 class Users(db.Model):
@@ -12,7 +12,7 @@ class Users(db.Model):
     user_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     github_username = db.Column(db.String(), nullable=False, unique=True)
 
-    sessions = db.relationship('Sessions', secondary=user_sessions_xref, back_populates='users', lazy='dynamic')
+    # sessions = db.relationship('Sessions', secondary=user_sessions_xref, back_populates='users', lazy='dynamic')
 
     def __init__(self, github_username):
         self.github_username = github_username
@@ -23,9 +23,9 @@ class Users(db.Model):
 
 class UserSchema(ma.Schema):
     class Meta:
-        fields = ["user_id", "github_username", "sessions"]
+        fields = ["user_id", "github_username"]
 
-        sessions = ma.fields.Nested("SessionSchema", many=True, exclude=("users",))
+        # sessions = ma.fields.Nested("SessionSchema", many=True, exclude=("users",))
 
 
 user_schema = UserSchema()

@@ -3,7 +3,6 @@ import uuid
 from datetime import datetime
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy_utils import JSONType
-from sqlalchemy_utils import ScalarListType as ListType
 
 from db import db
 from .session_repo_xref import session_repo_xref
@@ -15,7 +14,6 @@ class Sessions(db.Model):
     session_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = db.Column(db.String(), nullable=False)
     current_repo_id = db.Column(UUID(as_uuid=True), db.ForeignKey("Repositories.repo_id"))
-    repositories = db.Column(ListType(), nullable=False)
     num_of_commits = db.Column(db.Integer(), default=1, nullable=False)
     commit_by_repo_amount = db.Column(db.Boolean(), default=True, nullable=False)  # committing by a num of repos or a num of commits
     time_frame = db.Column(JSONType(), default={"8:17": "8:17"}, nullable=False)
@@ -26,10 +24,9 @@ class Sessions(db.Model):
     assigned_repos = db.relationship('Repositories', secondary=session_repo_xref, back_populates='assigned_sessions')
     # users = db.relationship('Users', secondary=user_sessions_xref, back_populates='sessions', lazy='dynamic')
 
-    def __init__(self, name, current_repo, repositories, num_of_commits, commit_by_repo_amount, time_frame, current_position, active):
+    def __init__(self, name, current_repo, num_of_commits, commit_by_repo_amount, time_frame, current_position, active):
         self.name = name
         self.current_repo = current_repo
-        self.repositories = repositories
         self.num_of_commits = num_of_commits
         self.commit_by_repo_amount = commit_by_repo_amount
         self.time_frame = time_frame
@@ -49,7 +46,7 @@ class Sessions(db.Model):
 
 class SessionSchema(ma.Schema):
     class Meta:
-        fields = ['name', 'session_id', 'current_repo_id', 'repositories', 'num_of_commits', 'commit_by_repo_amount', 'time_frame', 'latest_commit', 'current_position', 'active', 'assigned_repos']
+        fields = ['name', 'session_id', 'current_repo_id', 'num_of_commits', 'commit_by_repo_amount', 'time_frame', 'latest_commit', 'current_position', 'active', 'assigned_repos']
 
         # users = ma.fields.Nested('UserSchema', many=True, only=['user_id', 'github_username'])
         assigned_repos = ma.fields.Nested('RepoSchema', many=True)

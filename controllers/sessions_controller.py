@@ -137,7 +137,7 @@ def update_session(req: Request, id):
         return jsonify('Session not found'), 404
 
     if assigned_repo:
-        repo_query = db.session.query(Repositories).filter(Repositories.repo_id == assigned_repo).first
+        repo_query = db.session.query(Repositories).filter(Repositories.repo_id == assigned_repo).first()
         session.assigned_repos.append(repo_query)
 
     populate_obj(session, post_data)

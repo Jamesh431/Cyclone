@@ -5,6 +5,7 @@ from sqlalchemy_utils import ScalarListType as ListType
 
 from db import db
 from .users import UserSchema
+from session_repo_xref import session_repo_xref
 
 
 class Repositories(db.Model):
@@ -14,6 +15,9 @@ class Repositories(db.Model):
     sender_id = db.Column(UUID(as_uuid=True), db.ForeignKey("Users.user_id"), nullable=False)
     name = db.Column(db.String(), nullable=False)
     branches = db.Column(ListType())
+    active = db.Column(db.Boolean(), default=True, nullable=False)
+
+    assigned_sessions = db.relationship('Sessions', secondary=session_repo_xref, back_populates='assigned_repos')
 
     def __init__(self, sender_id, name, branches):
         self.sender_id = sender_id
@@ -26,9 +30,10 @@ class Repositories(db.Model):
 
 class RepoSchema(ma.Schema):
     class Meta:
-        fields = ['repo_id', 'sender_id', 'name', 'branches']
+        fields = ['repo_id', 'sender_id', 'name', 'branches', 'assigned_sessions']
 
-        user_id = ma.fields.Nested(UserSchema)
+    user_id = ma.fields.Nested(UserSchema)
+    assigned_sessions = ma.fields.Nested('SessionsSchema', many=True, only=['session_id', 'name', 'current_repo', 'time_frame', 'active'])
 
 
 repo_schema = RepoSchema()

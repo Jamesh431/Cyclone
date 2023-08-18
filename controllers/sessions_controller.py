@@ -4,7 +4,7 @@ from sqlalchemy.orm import aliased
 
 from db import db
 from models.sessions import Sessions, session_schema, sessions_schema
-from models.users import Users
+from models.users import Users, user_schema
 from models.user_sessions_xref import user_sessions_xref
 from util.reflection import populate_obj
 
@@ -38,6 +38,7 @@ def add_session(req: Request):
     populate_obj(new_session, post_data)
 
     db.session.add(new_session)
+<<<<<<< HEAD
 
     db.session.commit()
 
@@ -46,17 +47,35 @@ def add_session(req: Request):
     db.session.commit()
 
     # jsonify(session_schema.dump(new_session))
-
-    # session_data = session_schema.dump(new_session)
-
+=======
     # if receiver_id:
-    #     fetched_session = db.session.query(Sessions).filter(Sessions.session_id == session_data.session_id)
+    # user_object = db.session.get(Users, receiver_id)
+    # print(user)
+    # dumped_user = user_schema.dump(user)
+    # print(dumped_user["user_id"])
+    # new_session.users.append(dumped_user["user_id"])
+    db.session.commit()
 
-    #     fetched_session.user.append(user_query)
+    # return jsonify(session_schema.dump(new_session))
+>>>>>>> main
 
-    #     populate_obj(fetched_session, post_data)
+    session_data = session_schema.dump(new_session)
+    print(session_data)
 
+    if receiver_id:
+        fetched_session = db.session.query(Sessions).filter(Sessions.session_id == session_data['session_id']).first()
+
+        print(fetched_session)
+
+        fetched_session.users.append(user)
+
+<<<<<<< HEAD
     return jsonify({"message": "session created", "session_info": session_schema.dump(new_session)}), 201
+=======
+        session_data = fetched_session
+
+    return jsonify({"message": "session created", "session info": session_data}), 201
+>>>>>>> main
 
 
 def get_all_sessions(req: Request):

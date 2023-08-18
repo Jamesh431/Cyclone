@@ -98,33 +98,12 @@ def get_session(req: Request, id):
 
 
 def get_sessions_by_user_id(req: Request, user_id, show_all):
+    sessions = db.session.query(Sessions).filter(Sessions.receiving_user == user_id).all()
 
-    # xref_alias = aliased(user_sessions_xref)
-
-    # all_users_sessions = db.session.query(Sessions).join(xref_alias, Sessions.session_id == xref_alias.c.session_id).filter(xref_alias.c.receiver_id == user_id).all()
-    all_users_sessions = db.session.query(Sessions).join(user_sessions_xref).filter(user_sessions_xref.columns.receiver_id == user_id).all()
-    users_sessions = all_users_sessions
-    # sessions = sessions_schema.dump(query)
-
-    # user = db.session.query(Users).filter(Users.user_id == user_id).first()
-    # sessions = user_schema.dump(user).get("session", [])
-
-    if not all_users_sessions:
+    if not sessions:
         return jsonify('Sessions not found'), 404
     else:
-        if not show_all:
-            users_sessions = [user_session for user_session in all_users_sessions if user_session.get("active", True)]
-
-    return jsonify({"message": "sessions found", "all_sessions": sessions_schema.dump(users_sessions)}), 200
-
-    #         grouped_sessions = []
-    #         # include loop here that will loop through user sessions ids, gather all data for each of those sessions then return them below
-    #         for session_id in users_sessions:
-    #             session_query = db.session.query(Sessions).filter(Sessions.session_id == session_id).first()
-    #             session_iteration = session_schema.dump(session_query).first()
-    #             grouped_sessions.append(session_iteration)
-
-    # return jsonify(message="sessions found", sessions=grouped_sessions), 200
+        return jsonify(sessions_schema.dump(sessions)), 200
 
 
 def get_sessions_by_current_repo_id(req: Request, id):

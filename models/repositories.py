@@ -5,7 +5,7 @@ from sqlalchemy_utils import ScalarListType as ListType
 
 from db import db
 from .users import UserSchema
-from .session_repo_xref import session_repo_xref
+# from .session_repo_xref import session_repo_xref
 
 
 class Repositories(db.Model):
@@ -17,23 +17,24 @@ class Repositories(db.Model):
     branches = db.Column(ListType())
     active = db.Column(db.Boolean(), default=True, nullable=False)
 
-    assigned_sessions = db.relationship('Sessions', secondary=session_repo_xref, back_populates='assigned_repos')
+    # assigned_sessions = db.relationship('Sessions', secondary=session_repo_xref, back_populates='assigned_repos')
 
-    def __init__(self, sender_id, name, branches):
+    def __init__(self, sender_id, name, branches, active):
         self.sender_id = sender_id
         self.name = name
         self.branches = branches
+        self.active = active
 
     def new_repository():
-        return Repositories("", "", [])
+        return Repositories("", "", "", True)
 
 
 class RepoSchema(ma.Schema):
     class Meta:
-        fields = ['repo_id', 'sender_id', 'name', 'branches', 'assigned_sessions']
+        fields = ['repo_id', 'sender_id', 'name', 'branches', 'active']
 
-    sender_id = ma.fields.Nested(UserSchema)
-    assigned_sessions = ma.fields.Nested('SessionSchema', many=True, only=['session_id', 'name', 'time_frame', 'active'])
+        sender_id = ma.fields.Nested(UserSchema)
+        # assigned_sessions = ma.fields.Nested('SessionSchema', many=True, only=['session_id', 'name', 'active'])
 
 
 repo_schema = RepoSchema()

@@ -17,7 +17,7 @@ def add_repository(req: Request):
             missing_fields.append(field)
 
         if len(missing_fields):
-            return jsonify(f"{missing_fields} are required", 400)
+            return jsonify(f"missing required field(s): {missing_fields}", 400)
 
     new_repository = Repositories.new_repository()
 

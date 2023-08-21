@@ -7,8 +7,8 @@ from util.reflection import populate_obj
 
 def add_repository(req: Request):
     req_data = request.form if request.form else request.json
-    fields = ["sender_id", "name", "branches"]
-    req_fields = ["sender_id", "name"]
+    fields = ["sender_id", "name", "branches", "active"]
+    req_fields = ["sender_id", "name", "active"]
     missing_fields = []
 
     for field in fields:

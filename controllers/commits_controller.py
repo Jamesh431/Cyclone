@@ -65,15 +65,6 @@ def get_commits_by_repo_id(req: Request, id):
         return jsonify(commits_schema.dump(commits)), 200
 
 
-def get_commits_by_repo_id(req: Request, id):
-    commits = db.session.query(Commits).filter(id in Commits.current_repo).all()
-
-    if not commits:
-        return jsonify('commits not found'), 404
-    else:
-        return jsonify(commits_schema.dump(commits)), 200
-
-
 def update_commit(req: Request, id):
     post_data = request.json
     if not post_data:

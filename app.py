@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from db import *
 from flask_marshmallow import Marshmallow
+from flask_bcrypt import Bcrypt
 
 import os
 from models.auth_tokens import Auths
@@ -25,6 +26,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 init_db(app, db)
 ma = Marshmallow(app)
+bcrypt = Bcrypt(app)
 
 
 def create_all():

@@ -6,7 +6,6 @@ from db import db
 from models.sessions import Sessions, session_schema, sessions_schema
 from models.repositories import Repositories, repos_schema
 from models.session_repo_xref import SessionRepoXref, session_repo_xrefs
-from models.user_sessions_xref import user_sessions_xref
 from util.reflection import populate_obj
 
 

@@ -8,7 +8,7 @@ from models.users import Users
 from models.sessions import Sessions
 from models.repositories import Repositories
 from models.commits import Commits
-from models.user_sessions_xref import user_sessions_xref
+from models.session_repo_xref import SessionRepoXref
 import routes
 
 database_pre = os.environ.get("DATABASE_PRE")

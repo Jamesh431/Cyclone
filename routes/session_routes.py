@@ -40,6 +40,6 @@ def delete_session(session_id):
     return controller.delete_session(request, session_id)
 
 
-@session.route('/session/status/<id>', methods=["PATCH"])
+@sessions.route('/session/status/<id>', methods=["PATCH"])
 def session_activity(session_id):
     return controller.session_activity(request, session_id)

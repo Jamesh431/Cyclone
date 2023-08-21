@@ -5,7 +5,8 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy_utils import JSONType
 
 from db import db
-from .session_repo_xref import session_repo_xref
+# from .session_repo_xref import session_repo_xref
+from .users import UserSchema
 
 
 class Sessions(db.Model):
@@ -22,20 +23,21 @@ class Sessions(db.Model):
     current_position = db.Column(db.Integer(), default=0, nullable=False)
     active = db.Column(db.Boolean(), default=True, nullable=False)
 
-    assigned_repos = db.relationship('Repositories', secondary=session_repo_xref, back_populates='assigned_sessions')
+    # assigned_repos = db.relationship('Repositories', secondary=session_repo_xref, back_populates='assigned_sessions')
 
-    def __init__(self, receiving_user, name, current_repo, num_of_commits, commit_by_repo_amount, time_frame, current_position, active):
+    def __init__(self, receiving_user, name, current_repo_id, num_of_commits, commit_by_repo_amount, start_time, end_time, current_position, active):
         self.receiving_user = receiving_user
         self.name = name
-        self.current_repo = current_repo
+        self.current_repo_id = current_repo_id
         self.num_of_commits = num_of_commits
         self.commit_by_repo_amount = commit_by_repo_amount
-        self.time_frame = time_frame
+        self.start_time = start_time
+        self.end_time = end_time
         self.current_position = current_position
         self.active = active
 
     def new_session():
-        return Sessions("", "", "", 0, True, {}, 0, True)
+        return Sessions("", "", "", 0, True, "", "", 0, True)
 
     # @classmethod
     # def create_session(cls):
@@ -50,10 +52,11 @@ class Sessions(db.Model):
 
 class SessionSchema(ma.Schema):
     class Meta:
-        fields = ['name', 'session_id', 'current_repo_id', 'num_of_commits', 'commit_by_repo_amount', 'time_frame', 'latest_commit', 'current_position', 'active', 'assigned_repos']
+        fields = ['session_id', 'user_id', 'name', 'current_repo_id', 'num_of_commits', 'commit_by_repo_amount', 'start_time', 'end_time', 'latest_commit', 'current_position', 'active']
 
         # users = ma.fields.Nested('UserSchema', many=True, only=['user_id', 'github_username'])
-        assigned_repos = ma.fields.Nested('RepoSchema', many=True)
+        # assigned_repos = ma.fields.Nested('RepoSchema', many=True)
+        user_id = ma.fields.Nested(UserSchema())
 
 
 session_schema = SessionSchema()

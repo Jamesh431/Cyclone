@@ -69,7 +69,7 @@ def delete_user(req: Request, id):
         return jsonify({"message": "user not found"}), 404
 
 
-def users_activity(req: Request, id):
+def user_activity(req: Request, id):
     user = db.session.query(Users).filter(Users.user_id == id).first()
 
     if not user:

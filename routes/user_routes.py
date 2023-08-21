@@ -18,3 +18,18 @@ def get_all_users() -> Response:
 @users.route('/user/<user_id>', methods=['GET'])
 def get_user_by_id(user_id) -> Response:
     return controller.get_user_by_id(request, user_id)
+
+
+@users.route('/user/<user_id>', methods=["PATCH"])
+def update_user(user_id) -> Response:
+    return controller.update_user(request, user_id)
+
+
+@users.route('/user/<user_id>', methods=["DELETE"])
+def delete_user(user_id) -> Response:
+    return controller.delete_user(request, user_id)
+
+
+@users.route('/user/<user_id>', methods=["PATCH"])
+def user_activity(user_id) -> Response:
+    return controller.user_activity(request, user_id)

@@ -1,10 +1,11 @@
 # use response 202 for successful session creation if start time is not now ?
 from flask import request, Request, jsonify
-from sqlalchemy.orm import aliased
+# from sqlalchemy.orm import aliased
 
 from db import db
 from models.sessions import Sessions, session_schema, sessions_schema
 from models.repositories import Repositories, repos_schema
+from models.session_repo_xref import SessionRepoXref, session_repo_xrefs
 from models.user_sessions_xref import user_sessions_xref
 from util.reflection import populate_obj
 
@@ -12,15 +13,21 @@ from util.reflection import populate_obj
 def add_session(req: Request):
     post_data = request.form if request.form else request.json
 
-    fields = ["current_repo_id", "repositories", "num_of_commits", "commit_by_repo_amount", "time_to_commit", "time_frame", "latest_commit", "current_position", "active"]
+    fields = ['session_id', 'receiving_user', 'name', 'current_repo_id', 'num_of_commits', 'commit_by_repo_amount', 'start_time', 'end_time', 'latest_commit', 'current_position', 'active', 'assigned_repos']
 
-    req_fields = ["current_repo_id", "repositories", "num_of_commits", "commit_by_repo_amount", "time_frame", "current_position", "active"]
+    req_fields = ["current_repo_id", "num_of_commits", "commit_by_repo_amount", "start_time", "end_time", "current_position", "active"]
+
     assigned_repos = None
     repo = None
-    if "assigned_repos" in post_data:
-        assigned_repos = post_data.get("assigned_repos")
-        repo = db.session.query(Repositories).filter(Repositories.repo_id == assigned_repos).first()
-        print(assigned_repos)
+    if "repositories" in post_data:
+        assigned_repos = post_data.pop("repositories")
+
+        for repository_id in assigned_repos:
+            repo = db.session.query(Repositories).filter(Repositories.repo_id == repository_id).first()
+            print(assigned_repos)
+            # print("\n")
+            # print(repos_schema.dump(repo))  # can be used to grab each repo ["repo_id"]
+            # print("\n")
 
         if not repo:
             return jsonify(f"Repo not found: {assigned_repos}", 404)
@@ -35,7 +42,7 @@ def add_session(req: Request):
             return jsonify(f"{missing_fields} are required", 400)
 
     new_session = Sessions.new_session()
-    print(new_session)
+    # print(new_session.session_id)
     populate_obj(new_session, post_data)
 
     db.session.add(new_session)
@@ -44,22 +51,34 @@ def add_session(req: Request):
     # print(user)
     # dumped_user = user_schema.dump(user)
     # print(dumped_user["user_id"])
-    # new_session.users.append(dumped_user["user_id"])
+    # new_session.users.append(dumped_user["user_id"]
     db.session.commit()
-
-    # return jsonify(session_schema.dump(new_session))
-
     session_data = session_schema.dump(new_session)
     print(session_data)
+    # input()
 
     if repo:
-        fetched_session = db.session.query(Sessions).filter(Sessions.session_id == session_data['session_id']).first()
+        for repository in assigned_repos:
+            xref_check = db.session.query(SessionRepoXref).filter(SessionRepoXref.session_id == session_data["session_id"]).filter(SessionRepoXref.repo_id == repository).first()
 
-        print(fetched_session)
+            if xref_check:
+                print('xref relationship already exists')
+                continue
 
-        fetched_session.assigned_repos.append(repo)
+            new_session_repo_relationship = SessionRepoXref.new_session_repo_xref()
+            session_repo_dictionary = {'session_id': session_data["session_id"], 'repo_id': repository}
+            print(new_session_repo_relationship)
+            populate_obj(new_session_repo_relationship, session_repo_dictionary)
 
-        session_data = fetched_session
+            print(f"session_id: {new_session_repo_relationship.session_id}, repo_id: {new_session_repo_relationship.repo_id}")
+
+            input()
+            db.session.add(new_session_repo_relationship)
+            db.session.commit()
+
+        linked_repos = db.session.query(Repositories).filter(Repositories.repo_id.in_(assigned_repos)).all()
+
+        session_data["repositories"] = repos_schema.dump(linked_repos)
 
     return jsonify({"message": "session created", "session info": session_data}), 201
 
@@ -80,22 +99,6 @@ def get_session(req: Request, id):
         return jsonify('Session not found'), 404
     else:
         return jsonify(session_schema.dump(session)), 200
-
-
-# def tasks_get_by_user_id(req: Request, user_id, auth_info) -> Response:
-#     if validate_uuid4(user_id) == False:
-#         Logger("Invalid User ID, 400", "Bad Request")
-#         return jsonify({"message": "invalid id"}), 400
-
-#     user = db.session.query(AppUsers).filter(AppUsers.user_id == user_id).first()
-#     xref_alias = aliased(user_sessions_xref)
-#     db.session.query(Sessions).join(xref_alias, Sessions.session_id == xref_alias.c.session_id).filter(xref_alias.c.user_id == user)
-#     user_tasks =.filter(Tasks.assigned_users.any(AppUsers.user_id == user_id)).all()
-
-#     if not auth_info.user.role == "super-admin" and not auth_info.user.role == "admin":
-#         user_tasks = [task for task in user_tasks if task.active == True]
-
-#     return jsonify({"message": "tasks found", "tasks": tasks_schema.dump(user_tasks)}), 200
 
 
 def get_sessions_by_user_id(req: Request, user_id, show_all):
@@ -125,20 +128,44 @@ def get_sessions_by_repo_id(req: Request, id):
         return jsonify(sessions_schema.dump(sessions)), 200
 
 
+# def update_session(req: Request, id):
+#     post_data = request.json
+#     if not post_data:
+#         post_data = request.form
+
+#     session = db.session.query(Sessions).filter(Sessions.session_id == id).first()
+#     assigned_repo = post_data.get("assigned_repos")
+
+#     if not session:
+#         return jsonify('Session not found'), 404
+
+#     if assigned_repo:
+#         repo_query = db.session.query(Repositories).filter(Repositories.repo_id == assigned_repo).first()
+#         session.assigned_repos.append(repo_query)
+
+#     populate_obj(session, post_data)
+#     db.session.commit()
+#     return jsonify(session_schema.dump(session)), 201
+
+
 def update_session(req: Request, id):
     post_data = request.json
     if not post_data:
         post_data = request.form
 
     session = db.session.query(Sessions).filter(Sessions.session_id == id).first()
-    assigned_repo = post_data.get("assigned_repos")
+    assigned_repos = post_data.get("repositories")
 
     if not session:
         return jsonify('Session not found'), 404
 
-    if assigned_repo:
-        repo_query = db.session.query(Repositories).filter(Repositories.repo_id == assigned_repo).first()
-        session.assigned_repos.append(repo_query)
+    if assigned_repos:
+        repo_query = db.session.query(Repositories).filter(Repositories.repo_id.in_(assigned_repos)).all()
+        print(repo_query)
+        session.assigned_repos = session.assigned_repos + repo_query
+
+        for repo in repo_query:
+            session.assigned_repos.append(repo)
 
     populate_obj(session, post_data)
     db.session.commit()

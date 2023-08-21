@@ -8,8 +8,8 @@ from util.reflection import populate_obj
 def add_auth(req: Request):
     req_data = request.form if request.form else request.json
 
-    fields = ['github_token', 'user_id']
-    req_fields = ['github_token', 'user_id']
+    fields = ['github_token', 'user_id', 'active']
+    req_fields = ['github_token', 'user_id', 'active']
     missing_fields = []
 
     for field in fields:
@@ -81,3 +81,16 @@ def delete_auth(req: Request, id):
         return jsonify({"message": "Auth Deleted"}), 200
     else:
         return jsonify({"message": "Auth not found"}), 404
+
+
+def auth_activity(req: Request, id):
+    auth = db.session.query(Auths).filter(Auths.github_token == id).first()
+
+    if not auth:
+        return jsonify({"message": "auth not found"}), 404
+
+    auth.active = not auth.active
+
+    db.session.commit()
+
+    return jsonify({"message": "auth updated", "auth": auth_schema.dump(user)}), 200

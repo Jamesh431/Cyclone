@@ -32,21 +32,41 @@
 
 from flask import request, Blueprint
 
-from controllers import auth_controller
+from controllers import auth_tokens_controller as controller
 
-auth = Blueprint('Auth', __name__)
+auths = Blueprint('Auth', __name__)
 
 
-@auth.route('/auth', methods=["POST"])
+@auths.route('/auth', methods=["POST"])
 def add_authorization():
-    return auth_controller.add_auth_token()
+    return controller.add_auth()
 
 
-@auth.route("/auth<id>", methods=["GET"])
-def get_auth_by_id(id):
-    return auth_controller.get_auth_by_id(id)
-
-
-@auth.route("/auth", methods=["GET"])
+@auths.route("/auth", methods=["GET"])
 def get_all_auths():
-    return auth_controller.get_all_auths()
+    return controller.get_all_auths()
+
+
+@auths.route("/auth<id>", methods=["GET"])
+def get_auth_by_id(id):
+    return controller.get_auth(id)
+
+
+@auths.route('/auth/<user_id>', methods=['GET'])
+def get_auth_by_user_id(user_id):
+    return controller.get_auth_by_user_id(request, user_id)
+
+
+@auths.route('/auth/<auth_id>', methods=["PATCH"])
+def update_auth(auth_id):
+    return controller.update_auth(request, auth_id)
+
+
+@auths.route('/auth/<auth_id>', methods=["DELETE"])
+def delete_auth(auth_id):
+    return controller.delete_auth(request, auth_id)
+
+
+@auths.route('/auth/<github_token>', methods=["PATCH"])
+def auth_activity(github_token):
+    return controller.auth_activity(request, github_token)

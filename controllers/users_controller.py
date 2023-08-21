@@ -7,8 +7,8 @@ from util.reflection import populate_obj
 
 def add_user(req: Request):
     req_data = request.form if request.form else request.json
-    fields = ["github_username"]
-    req_fields = ["github_username"]
+    fields = ["github_username", "active"]
+    req_fields = ["github_username", "active"]
 
     missing_fields = []
 
@@ -68,3 +68,16 @@ def delete_user(req: Request, id):
         return jsonify({"message": "user deleted"}), 200
     else:
         return jsonify({"message": "user not found"}), 404
+
+
+def users_activity(req: Request, id):
+    user = db.session.query(Users).filter(Users.user_id == id).first()
+
+    if not user:
+        return jsonify({"message": "user not found"}), 404
+
+    user.active = not user.active
+
+    db.session.commit()
+
+    return jsonify({"message": "user updated", "user": user_schema.dump(user)}), 200

@@ -24,7 +24,6 @@ def add_session(req: Request):
 
         for repository_id in assigned_repos:
             repo = db.session.query(Repositories).filter(Repositories.repo_id == repository_id).first()
-            print(assigned_repos)
             # print("\n")
             # print(repos_schema.dump(repo))  # can be used to grab each repo ["repo_id"]
             # print("\n")

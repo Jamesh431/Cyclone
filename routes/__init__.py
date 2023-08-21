@@ -1,4 +1,6 @@
 # from .auth_routes import auth
 from .user_routes import users
-from .repository_routes import repositories
+from .auth_routes import auths
+from .repository_routes import repos
 from .session_routes import sessions
+from .commit_routes import commits

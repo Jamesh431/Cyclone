@@ -54,8 +54,6 @@ def add_session(req: Request):
     # new_session.users.append(dumped_user["user_id"]
     db.session.commit()
     session_data = session_schema.dump(new_session)
-    print(session_data)
-    # input()
 
     if repo:
         for repository in assigned_repos:
@@ -67,12 +65,8 @@ def add_session(req: Request):
 
             new_session_repo_relationship = SessionRepoXref.new_session_repo_xref()
             session_repo_dictionary = {'session_id': session_data["session_id"], 'repo_id': repository}
-            print(new_session_repo_relationship)
             populate_obj(new_session_repo_relationship, session_repo_dictionary)
 
-            print(f"session_id: {new_session_repo_relationship.session_id}, repo_id: {new_session_repo_relationship.repo_id}")
-
-            input()
             db.session.add(new_session_repo_relationship)
             db.session.commit()
 

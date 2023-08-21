@@ -79,7 +79,7 @@ def get_all_sessions(req: Request):
     sessions = db.session.query(Sessions).all()
 
     if not sessions:
-        return jsonify('No Sessions found'), 404
+        return jsonify('no sessions found'), 404
     else:
         return jsonify(sessions_schema.dump(sessions)), 200
 
@@ -88,7 +88,7 @@ def get_session(req: Request, id):
     session = db.session.query(Sessions).filter(Sessions.session_id == id).first()
 
     if not session:
-        return jsonify('Session not found'), 404
+        return jsonify('session not found'), 404
     else:
         return jsonify(session_schema.dump(session)), 200
 
@@ -97,7 +97,7 @@ def get_sessions_by_user_id(req: Request, user_id, show_all):
     sessions = db.session.query(Sessions).filter(Sessions.receiving_user == user_id).all()
 
     if not sessions:
-        return jsonify('Sessions not found'), 404
+        return jsonify('sessions not found'), 404
     else:
         return jsonify(sessions_schema.dump(sessions)), 200
 
@@ -106,7 +106,7 @@ def get_sessions_by_current_repo_id(req: Request, id):
     sessions = db.session.query(Sessions).filter(Sessions.current_repo == id).all()
 
     if not sessions:
-        return jsonify('Sessions not found'), 404
+        return jsonify('sessions not found'), 404
     else:
         return jsonify(sessions_schema.dump(sessions)), 200
 
@@ -115,7 +115,7 @@ def get_sessions_by_repo_id(req: Request, id):
     sessions = db.session.query(Sessions).filter(id in Sessions.current_repo).all()
 
     if not sessions:
-        return jsonify('Sessions not found'), 404
+        return jsonify('sessions not found'), 404
     else:
         return jsonify(sessions_schema.dump(sessions)), 200
 
@@ -149,7 +149,7 @@ def update_session(req: Request, id):
     assigned_repos = post_data.get("repositories")
 
     if not session:
-        return jsonify('Session not found'), 404
+        return jsonify('session not found'), 404
 
     if assigned_repos:
         repo_query = db.session.query(Repositories).filter(Repositories.repo_id.in_(assigned_repos)).all()
@@ -170,16 +170,16 @@ def delete_session(req: Request, id):
     if session:
         db.session.delete(session)
         db.session.commit()
-        return jsonify({"message": "Session Deleted"}), 200
+        return jsonify({"message": "session deleted"}), 204
     else:
-        return jsonify({"message": "Session not found"}), 404
+        return jsonify({"message": "session not found"}), 404
 
 
 def session_activity(req: Request, id):
     session = db.session.query(Sessions).filter(Sessions.session_id == id).first()
 
     if not session:
-        return jsonify({"message": "Session not found"}), 404
+        return jsonify({"message": "session not found"}), 404
 
     session.active = not session.active
 

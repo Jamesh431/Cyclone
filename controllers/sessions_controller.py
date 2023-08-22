@@ -89,7 +89,12 @@ def get_session(req: Request, id):
 
 
 def get_sessions_by_user_id(req: Request, user_id, show_all):
-    sessions = db.session.query(Sessions).filter(Sessions.receiving_user == user_id).all()
+    sessions = None
+
+    if show_all:
+        sessions = db.session.query(Sessions).filter(Sessions.receiving_user == user_id).all()
+    else:
+        sessions = db.session.query(Sessions).filter(Sessions.receiving_user == user_id).filter(Sessions.active == True).all()
 
     if not sessions:
         return jsonify('sessions not found'), 404

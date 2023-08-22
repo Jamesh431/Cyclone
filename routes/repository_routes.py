@@ -20,7 +20,7 @@ def get_repo_by_search():
     return controller.get_repository_by_search(request)
 
 
-@repos.route('/repo/<sender_id>', methods=['GET'])
+@repos.route('/repo/sender/<sender_id>', methods=['GET'])
 def get_repos_by_sender_id(sender_id):
     return controller.get_repositories_by_sender_id(request, sender_id)
 

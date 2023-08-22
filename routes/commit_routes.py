@@ -20,7 +20,7 @@ def get_commit_by_id(commit_id):
     return controller.get_commit(request, commit_id)
 
 
-@commits.route('/commit/<commit_id>', methods=['GET'])
+@commits.route('/commit/<repo_id>', methods=['GET'])
 def get_commits_by_repo_id(repo_id):
     return controller.get_commits_by_repo_id(request, repo_id)
 

@@ -143,14 +143,23 @@ def update_session(req: Request, id):
     repo = None
     assigned_repos = None
 
-    if "repositories" in post_data:
-        assigned_repos = post_data.pop("repositories")
+    if "add_repositories" in post_data:
+        assigned_repos = post_data.pop("add_repositories")
 
         for repository_id in assigned_repos:
             repo = db.session.query(Repositories).filter(Repositories.repo_id == repository_id).first()
 
-        if not repo:
-            return jsonify(f"Repo not found: {assigned_repos}", 404)
+            if not repo:
+                return jsonify(f"Repo not found: {repository_id}", 404)
+
+    if "delete_repositories" in post_data:
+        repos_to_expunge = post_data.pop("delete_repositories")
+
+        for repository_id in repos_to_expunge:
+            repo = db.session.query(Repositories).filter(Repositories.repo_id == repository_id).first()
+
+            if not repo:
+                return jsonify(f"Repo not found: {repository_id}", 404)
 
     session = db.session.query(Sessions).filter(Sessions.session_id == id).first()
 
@@ -171,7 +180,14 @@ def update_session(req: Request, id):
             populate_obj(new_session_repo_relationship, session_repo_dictionary)
 
             db.session.add(new_session_repo_relationship)
-            db.session.commit()
+
+        for repository in repos_to_expunge:
+            xref_check = db.session.query(SessionRepoXref).filter(SessionRepoXref.session_id == session_data["session_id"]).filter(SessionRepoXref.repo_id == repository).first()
+
+            if xref_check:
+                db.session.delete(xref_check)
+
+        db.session.commit()
 
         linked_repos = db.session.query(Repositories).filter(Repositories.repo_id.in_(assigned_repos)).all()
 

@@ -1,5 +1,4 @@
 import marshmallow as ma
-import uuid
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy_utils import ScalarListType as ListType
 
@@ -11,7 +10,7 @@ from .users import UserSchema
 class Repositories(db.Model):
     __tablename__ = "Repositories"
 
-    repo_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    repo_id = db.Column(db.String(), primary_key=True, nullable=False)
     sender_id = db.Column(UUID(as_uuid=True), db.ForeignKey("Users.user_id"), nullable=False)
     name = db.Column(db.String(), nullable=False)
     ssh_key = db.Column(db.String(), nullable=False)
@@ -20,7 +19,8 @@ class Repositories(db.Model):
 
     # assigned_sessions = db.relationship('Sessions', secondary=session_repo_xref, back_populates='assigned_repos')
 
-    def __init__(self, sender_id, name, ssh_key, branches, active):
+    def __init__(self, repo_id, sender_id, name, ssh_key, branches, active):
+        self.repo_id = repo_id
         self.sender_id = sender_id
         self.name = name
         self.ssh_key = ssh_key
@@ -28,7 +28,7 @@ class Repositories(db.Model):
         self.active = active
 
     def new_repository():
-        return Repositories("", "", "", "", True)
+        return Repositories("", "", "", "", "", True)
 
 
 class RepoSchema(ma.Schema):

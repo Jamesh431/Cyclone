@@ -12,7 +12,7 @@ from .users import UserSchema
 class Sessions(db.Model):
     __tablename__ = "Sessions"
 
-    session_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    session_id = db.Column(db.String(), primary_key=True, nullable=False)
     receiving_user = db.Column(UUID(as_uuid=True), db.ForeignKey("Users.user_id"), nullable=False)
     name = db.Column(db.String(), nullable=False)
     current_repo_id = db.Column(UUID(as_uuid=True), db.ForeignKey("Repositories.repo_id"))
@@ -25,7 +25,8 @@ class Sessions(db.Model):
 
     # assigned_repos = db.relationship('Repositories', secondary=session_repo_xref, back_populates='assigned_sessions')
 
-    def __init__(self, receiving_user, name, current_repo_id, num_of_commits, commit_by_repo_amount, start_time, end_time, current_position, active):
+    def __init__(self, session_id, receiving_user, name, current_repo_id, num_of_commits, commit_by_repo_amount, start_time, end_time, current_position, active):
+        self.session_id = session_id
         self.receiving_user = receiving_user
         self.name = name
         self.current_repo_id = current_repo_id
@@ -37,7 +38,7 @@ class Sessions(db.Model):
         self.active = active
 
     def new_session():
-        return Sessions("", "", "", 0, True, "", "", 0, True)
+        return Sessions("", "", "", "", 0, True, "", "", 0, True)
 
     # @classmethod
     # def create_session(cls):

@@ -14,8 +14,8 @@ from db import db
 class SessionRepoXref(db.Model):
     __tablename__ = "SessionRepoXref"
 
-    session_id = db.Column(UUID(as_uuid=True), db.ForeignKey("Sessions.session_id"), primary_key=True)
-    repo_id = db.Column(UUID(as_uuid=True), db.ForeignKey("Repositories.repo_id"), primary_key=True)
+    session_id = db.Column(db.String(), db.ForeignKey("Sessions.session_id"), primary_key=True)
+    repo_id = db.Column(db.String(), db.ForeignKey("Repositories.repo_id"), primary_key=True)
 
     def __init__(self, session_id, repo_id):
         self.session_id = session_id

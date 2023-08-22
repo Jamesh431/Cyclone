@@ -35,16 +35,16 @@ def get_sessions_by_repo(repo_id):
     return controller.get_sessions_by_repo_id(request, repo_id)
 
 
-@sessions.route('/session/<id>', methods=["PATCH"])
+@sessions.route('/session/<session_id>', methods=["PATCH"])
 def update_session(session_id):
     return controller.update_session(request, session_id)
 
 
-@sessions.route('/session/<id>', methods=["DELETE"])
+@sessions.route('/session/<session_id>', methods=["DELETE"])
 def delete_session(session_id):
     return controller.delete_session(request, session_id)
 
 
-@sessions.route('/session/status/<id>', methods=["PATCH"])
+@sessions.route('/session/status/<session_id>', methods=["PATCH"])
 def session_activity(session_id):
     return controller.session_activity(request, session_id)

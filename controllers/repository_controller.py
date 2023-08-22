@@ -16,8 +16,8 @@ def add_repository(req: Request):
         if field in req_fields and not field_data:
             missing_fields.append(field)
 
-        if len(missing_fields):
-            return jsonify(f"missing required field(s): {missing_fields}", 400)
+    if len(missing_fields):
+        return jsonify(f"missing required field(s): {missing_fields}", 400)
 
     new_repository = Repositories.new_repository()
 
@@ -26,7 +26,7 @@ def add_repository(req: Request):
     db.session.add(new_repository)
     db.session.commit()
 
-    return jsonify({"message": "repository created", "repository_info": repo_schema.dump(new_repository)}), 201
+    return jsonify({"message": "repository created", "repository": repo_schema.dump(new_repository)}), 201
 
 
 def get_all_repositories(req: Request):
@@ -51,7 +51,7 @@ def get_repository(req: Request, id):
     repository = db.session.query(Repositories).filter(Repositories.repo_id == id).first()
 
     if repository:
-        return jsonify({"message": "repository found", "repository": repository}), 200
+        return jsonify({"message": "repository found", "repository": repo_schema.dump(repository)}), 200
     else:
         return jsonify({"message": "repository not found"}), 404
 
@@ -61,7 +61,9 @@ def get_repository_by_search(req: Request):
 
     search_query = db.session.query(Repositories).filter(db.or_(db.func.lower(Repositories.name).contains(formatted_search)))
 
-    return jsonify({"message": "results", "repositories": repo_schema.dump(search_query)}), 200
+    search_data = search_query.order_by(Repositories.name.asc()).all()
+
+    return jsonify({"message": "results", "repositories": repos_schema.dump(search_data)}), 200
 
 
 def get_repositories_by_sender_id(req: Request, id):
@@ -90,7 +92,7 @@ def update_repository(req: Request, id):
 
 
 def delete_repository(req: Request, id):
-    expunged_repository = db.session.query(Repositories).filter(Repositories.repo_id == id).first
+    expunged_repository = db.session.query(Repositories).filter(Repositories.repo_id == id).first()
 
     if not expunged_repository:
         return jsonify({"message": "repository not found"}), 404
@@ -98,7 +100,7 @@ def delete_repository(req: Request, id):
     db.session.delete(expunged_repository)
     db.session.commit()
 
-    return jsonify({"message": "repository deleted"}), 204
+    return jsonify({"message": "repository deleted"}), 200
 
 
 def repository_activity(req: Request, id):

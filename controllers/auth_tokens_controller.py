@@ -17,8 +17,8 @@ def add_auth(req: Request):
         if field in req_fields and not field_data:
             missing_fields.append(field)
 
-        if len(missing_fields):
-            return jsonify(f"missing required field(s): {missing_fields}", 400)
+    if len(missing_fields):
+        return jsonify(f"missing required field(s): {missing_fields}", 400)
 
     new_auth = Auths.new_auth()
 
@@ -27,7 +27,7 @@ def add_auth(req: Request):
     db.session.add(new_auth)
     db.session.commit()
 
-    return jsonify({"message": "auth created", "auth_info": auth_schema.dump(new_auth)}), 201
+    return jsonify({"message": "auth created", "auth": auth_schema.dump(new_auth)}), 201
 
 
 def get_all_auths(req: Request):

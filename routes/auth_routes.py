@@ -7,20 +7,20 @@ auths = Blueprint('Auth', __name__)
 
 @auths.route('/auth', methods=["POST"])
 def add_authorization():
-    return controller.add_auth()
+    return controller.add_auth(request)
 
 
-@auths.route("/auth", methods=["GET"])
+@auths.route("/auths", methods=["GET"])
 def get_all_auths():
-    return controller.get_all_auths()
+    return controller.get_all_auths(request)
 
 
-@auths.route("/auth<id>", methods=["GET"])
+@auths.route("/auth/<id>", methods=["GET"])
 def get_auth_by_id(id):
-    return controller.get_auth(id)
+    return controller.get_auth(request, id)
 
 
-@auths.route('/auth/<user_id>', methods=['GET'])
+@auths.route('/auth/u/<user_id>', methods=['GET'])
 def get_auth_by_user_id(user_id):
     return controller.get_auth_by_user_id(request, user_id)
 

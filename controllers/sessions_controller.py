@@ -33,8 +33,8 @@ def add_session(req: Request):
         if field_data in req_fields and not field_data:
             missing_fields.append(field)
 
-        if len(missing_fields):
-            return jsonify(f"{missing_fields} are required", 400)
+    if len(missing_fields):
+        return jsonify(f"{missing_fields} are required", 400)
 
     new_session = Sessions.new_session()
     populate_obj(new_session, post_data)
@@ -67,7 +67,7 @@ def add_session(req: Request):
 
         session_data["repositories"] = repos_schema.dump(linked_repos)
 
-    return jsonify({"message": "session created", "session info": session_data}), 201
+    return jsonify({"message": "session created", "session": session_data}), 201
 
 
 def get_all_sessions(req: Request):
@@ -91,7 +91,7 @@ def get_session(req: Request, id):
 def get_sessions_by_user_id(req: Request, user_id, show_all):
     sessions = None
 
-    if show_all:
+    if show_all == "all":
         sessions = db.session.query(Sessions).filter(Sessions.receiving_user == user_id).all()
     else:
         sessions = db.session.query(Sessions).filter(Sessions.receiving_user == user_id).filter(Sessions.active == True).all()
@@ -103,7 +103,7 @@ def get_sessions_by_user_id(req: Request, user_id, show_all):
 
 
 def get_sessions_by_current_repo_id(req: Request, id):
-    sessions = db.session.query(Sessions).filter(Sessions.current_repo == id).all()
+    sessions = db.session.query(Sessions).filter(Sessions.current_repo_id == id).all()
 
     if not sessions:
         return jsonify('sessions not found'), 404
@@ -112,12 +112,13 @@ def get_sessions_by_current_repo_id(req: Request, id):
 
 
 def get_sessions_by_repo_id(req: Request, id):
-    sessions = db.session.query(Sessions).filter(id in Sessions.current_repo).all()
 
-    if not sessions:
+    join_sessions_query = db.session.query(Sessions).join(SessionRepoXref, Sessions.session_id == SessionRepoXref.session_id).filter(SessionRepoXref.repo_id == id).all()
+
+    if not join_sessions_query:
         return jsonify('sessions not found'), 404
     else:
-        return jsonify(sessions_schema.dump(sessions)), 200
+        return jsonify(sessions_schema.dump(join_sessions_query)), 200
 
 
 # def update_session(req: Request, id):
@@ -146,7 +147,8 @@ def update_session(req: Request, id):
         post_data = request.form
 
     repo = None
-    assigned_repos = None
+    assigned_repos = []
+    repos_to_expunge = []
 
     if "add_repositories" in post_data:
         assigned_repos = post_data.pop("add_repositories")
@@ -174,23 +176,25 @@ def update_session(req: Request, id):
     session_data = session_schema.dump(session)
 
     if repo:
-        for repository in assigned_repos:
-            xref_check = db.session.query(SessionRepoXref).filter(SessionRepoXref.session_id == session_data["session_id"]).filter(SessionRepoXref.repo_id == repository).first()
+        if assigned_repos:
+            for repository in assigned_repos:
+                xref_check = db.session.query(SessionRepoXref).filter(SessionRepoXref.session_id == session_data["session_id"]).filter(SessionRepoXref.repo_id == repository).first()
 
-            if xref_check:
-                continue
+                if xref_check:
+                    continue
 
-            new_session_repo_relationship = SessionRepoXref.new_session_repo_xref()
-            session_repo_dictionary = {'session_id': session_data["session_id"], 'repo_id': repository}
-            populate_obj(new_session_repo_relationship, session_repo_dictionary)
+                new_session_repo_relationship = SessionRepoXref.new_session_repo_xref()
+                session_repo_dictionary = {'session_id': session_data["session_id"], 'repo_id': repository}
+                populate_obj(new_session_repo_relationship, session_repo_dictionary)
 
-            db.session.add(new_session_repo_relationship)
+                db.session.add(new_session_repo_relationship)
 
-        for repository in repos_to_expunge:
-            xref_check = db.session.query(SessionRepoXref).filter(SessionRepoXref.session_id == session_data["session_id"]).filter(SessionRepoXref.repo_id == repository).first()
+        if repos_to_expunge:
+            for repository in repos_to_expunge:
+                xref_check = db.session.query(SessionRepoXref).filter(SessionRepoXref.session_id == session_data["session_id"]).filter(SessionRepoXref.repo_id == repository).first()
 
-            if xref_check:
-                db.session.delete(xref_check)
+                if xref_check:
+                    db.session.delete(xref_check)
 
         db.session.commit()
 
@@ -207,9 +211,16 @@ def delete_session(req: Request, id):
     session = db.session.query(Sessions).filter(Sessions.session_id == id).first()
 
     if session:
+        check_xref = db.session.query(SessionRepoXref).filter(SessionRepoXref.session_id == id).all()
+
+        if check_xref:
+            for relationship in check_xref:
+                db.session.delete(relationship)
+            db.session.commit()
+
         db.session.delete(session)
         db.session.commit()
-        return jsonify({"message": "session deleted"}), 204
+        return jsonify({"message": "session deleted"}), 200
     else:
         return jsonify({"message": "session not found"}), 404
 

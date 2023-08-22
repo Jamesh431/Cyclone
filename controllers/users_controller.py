@@ -21,8 +21,9 @@ def add_user(req: Request):
         if field in req_fields and not field_data:
             missing_fields.append(field)
 
-        if len(missing_fields):
-            return jsonify(f"missing required field(s): {missing_fields}", 400)
+    if len(missing_fields):
+        return jsonify(f"missing required field(s): {missing_fields}", 400)
+
     new_user = Users.new_user()
 
     populate_obj(new_user, post_data)

@@ -2,6 +2,7 @@ from flask import request, Request, jsonify
 
 from db import db
 from models.commits import Commits, commit_schema, commits_schema
+from models.repositories import repo_schema
 from models.repositories import Repositories
 from util.reflection import populate_obj
 
@@ -9,9 +10,9 @@ from util.reflection import populate_obj
 def add_commit(req: Request):
     post_data = request.form if request.form else request.json
 
-    fields = ["repo_id", "comment", "position"]
+    fields = ["commit_id", "repo_id", "comment", "position"]
 
-    req_fields = ["repo_id", "comment", "position"]
+    req_fields = ["commit_id", "repo_id", "comment", "position"]
 
     missing_fields = []
     for field in fields:
@@ -19,13 +20,15 @@ def add_commit(req: Request):
         if field_data in req_fields and not field_data:
             missing_fields.append(field)
 
-        if len(missing_fields):
-            return jsonify(f"missing required field(s): {missing_fields}", 400)
+    if len(missing_fields):
+        return jsonify(f"missing required field(s): {missing_fields}", 400)
 
     repo_check = db.session.query(Repositories).filter(Repositories.repo_id == post_data["repo_id"]).first()
 
     if not repo_check:
         return jsonify(f"repo {post_data['repo_id']}not found")
+
+    linked_repo = repo_schema.dump(repo_check)
 
     new_commit = Commits.new_commit()
     populate_obj(new_commit, post_data)
@@ -33,9 +36,11 @@ def add_commit(req: Request):
     db.session.add(new_commit)
     db.session.commit()
     commit_data = commit_schema.dump(new_commit)
-    commit_data["repo_id"] = repo_check
+    print(commit_data)
+    commit_data["repo_id"] = linked_repo
+    print(commit_data)
 
-    return jsonify({"message": "commit created", "commit info": commit_data}), 201
+    return jsonify({"message": "commit created", "commit": commit_data}), 201
 
 
 def get_all_commits(req: Request):

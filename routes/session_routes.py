@@ -10,6 +10,11 @@ def add_session():
     return controller.add_session(request)
 
 
+@sessions.route('/session/<session_id>', methods=["GET"])
+def get_session(session_id):
+    return controller.get_session(request, session_id)
+
+
 @sessions.route('/sessions', methods=["GET"])
 def get_all_sessions():
     return controller.get_all_sessions(request)

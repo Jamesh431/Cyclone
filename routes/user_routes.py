@@ -30,6 +30,6 @@ def delete_user(user_id):
     return controller.delete_user(request, user_id)
 
 
-@users.route('/user/<user_id>', methods=["PATCH"])
+@users.route('/user/status/<user_id>', methods=["PATCH"])
 def user_activity(user_id):
     return controller.user_activity(request, user_id)

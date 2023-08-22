@@ -35,6 +35,6 @@ def delete_auth(auth_id):
     return controller.delete_auth(request, auth_id)
 
 
-@auths.route('/auth/<github_token>', methods=["PATCH"])
+@auths.route('/auth/status/<github_token>', methods=["PATCH"])
 def auth_activity(github_token):
     return controller.auth_activity(request, github_token)

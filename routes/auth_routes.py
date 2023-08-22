@@ -30,11 +30,11 @@ def update_auth(auth_id):
     return controller.update_auth(request, auth_id)
 
 
-@auths.route('/auth/<auth_id>', methods=["DELETE"])
-def delete_auth(auth_id):
-    return controller.delete_auth(request, auth_id)
-
-
 @auths.route('/auth/status/<github_token>', methods=["PATCH"])
 def auth_activity(github_token):
     return controller.auth_activity(request, github_token)
+
+
+@auths.route('/auth/<auth_id>', methods=["DELETE"])
+def delete_auth(auth_id):
+    return controller.delete_auth(request, auth_id)

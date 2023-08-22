@@ -40,11 +40,11 @@ def update_session(session_id):
     return controller.update_session(request, session_id)
 
 
-@sessions.route('/session/<session_id>', methods=["DELETE"])
-def delete_session(session_id):
-    return controller.delete_session(request, session_id)
-
-
 @sessions.route('/session/status/<session_id>', methods=["PATCH"])
 def session_activity(session_id):
     return controller.session_activity(request, session_id)
+
+
+@sessions.route('/session/<session_id>', methods=["DELETE"])
+def delete_session(session_id):
+    return controller.delete_session(request, session_id)

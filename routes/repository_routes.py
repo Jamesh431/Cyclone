@@ -40,11 +40,11 @@ def update_repo(repo_id):
     return controller.update_repository(request, repo_id)
 
 
-@repos.route('/repo/<repo_id>', methods=["DELETE"])
-def delete_repo(repo_id):
-    return controller.delete_repository(request, repo_id)
-
-
 @repos.route('/repo/status/<repo_id>', methods=["PATCH"])
 def repo_activity(repo_id):
     return controller.repository_activity(request, repo_id)
+
+
+@repos.route('/repo/<repo_id>', methods=["DELETE"])
+def delete_repo(repo_id):
+    return controller.delete_repository(request, repo_id)

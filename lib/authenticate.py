@@ -27,7 +27,7 @@ def fail_response():
 
 
 def fail_perm_response():
-    return Response("Vibe check: Failed", 403)
+    return Response("Invalid GitHub Token", 403)
 
 
 def auth_with_return(func):

@@ -40,15 +40,15 @@ def get_users(req: Request):
     return jsonify(users_schema.dump(users)), 200
 
 
-def get_user_by_id(req: Request, user_id):
-    user = db.session.query(Users).filter(Users.user_id == user_id).first()
+def get_user_by_github_username(req: Request, github_username):
+    user = db.session.query(Users).filter(Users.github_username == github_username).first()
     if user:
         return jsonify(user_schema.dump(user)), 200
 
     return jsonify("User Not Found"), 404
 
 
-def update_user(req: Request, id):
+def update_user(req: Request, github_username):
     patch_data = request.json
     if not patch_data:
         patch_data = request.form
@@ -56,7 +56,7 @@ def update_user(req: Request, id):
     if "cyclone_pass" in patch_data:
         patch_data["cyclone_pass"] = generate_password_hash(patch_data["cyclone_pass"]).decode("utf8")
 
-    user = db.session.query(Users).filter(Users.user_id == id).first()
+    user = db.session.query(Users).filter(Users.github_username == github_username).first()
 
     if not user:
         return jsonify('User not found'), 404
@@ -66,8 +66,8 @@ def update_user(req: Request, id):
     return jsonify(user_schema.dump(user)), 201
 
 
-def delete_user(req: Request, id):
-    user = db.session.query(Users).filter(Users.user_id == id).first()
+def delete_user(req: Request, github_username):
+    user = db.session.query(Users).filter(Users.github_username == github_username).first()
 
     if user:
         db.session.delete(user)
@@ -77,8 +77,8 @@ def delete_user(req: Request, id):
         return jsonify({"message": "user not found"}), 404
 
 
-def user_activity(req: Request, id):
-    user = db.session.query(Users).filter(Users.user_id == id).first()
+def user_activity(req: Request, github_username):
+    user = db.session.query(Users).filter(Users.github_username == github_username).first()
 
     if not user:
         return jsonify({"message": "user not found"}), 404

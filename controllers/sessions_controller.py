@@ -44,8 +44,8 @@ def add_session(req: Request):
     # user_object = db.session.get(Users, receiver_id)
     # print(user)
     # dumped_user = user_schema.dump(user)
-    # print(dumped_user["user_id"])
-    # new_session.users.append(dumped_user["user_id"]
+    # print(dumped_user["github_username"])
+    # new_session.users.append(dumped_user["github_username"]
     db.session.commit()
     session_data = session_schema.dump(new_session)
 
@@ -88,13 +88,13 @@ def get_session(req: Request, id):
         return jsonify(session_schema.dump(session)), 200
 
 
-def get_sessions_by_user_id(req: Request, user_id, show_all):
+def get_sessions_by_github_username(req: Request, github_username, show_all):
     sessions = None
 
     if show_all == "all":
-        sessions = db.session.query(Sessions).filter(Sessions.receiving_user == user_id).all()
+        sessions = db.session.query(Sessions).filter(Sessions.receiving_user == github_username).all()
     else:
-        sessions = db.session.query(Sessions).filter(Sessions.receiving_user == user_id).filter(Sessions.active == True).all()
+        sessions = db.session.query(Sessions).filter(Sessions.receiving_user == github_username).filter(Sessions.active == True).all()
 
     if not sessions:
         return jsonify('sessions not found'), 404

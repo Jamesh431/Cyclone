@@ -7,8 +7,8 @@ from util.reflection import populate_obj
 
 def add_repository(req: Request):
     req_data = request.form if request.form else request.json
-    fields = ["sender_id", "name", "ssh_key", "branches", "active"]
-    req_fields = ["sender_id", "name", "ssh_key", "active"]
+    fields = ["senders_github_username", "name", "ssh_key", "branches", "active"]
+    req_fields = ["senders_github_username", "name", "ssh_key", "active"]
     missing_fields = []
 
     for field in fields:
@@ -66,8 +66,8 @@ def get_repository_by_search(req: Request):
     return jsonify({"message": "results", "repositories": repos_schema.dump(search_data)}), 200
 
 
-def get_repositories_by_sender_id(req: Request, id):
-    senders_repositories = db.session.query(Repositories).filter(Repositories.sender_id == id).all()
+def get_repositories_by_senders_github_username(req: Request, id):
+    senders_repositories = db.session.query(Repositories).filter(Repositories.senders_github_username == id).all()
 
     if senders_repositories:
         return jsonify({"message": "repositories found", "repositories": repos_schema.dump(senders_repositories)}), 200

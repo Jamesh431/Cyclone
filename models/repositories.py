@@ -11,7 +11,7 @@ class Repositories(db.Model):
     __tablename__ = "Repositories"
 
     repo_id = db.Column(db.String(), primary_key=True, nullable=False)
-    sender_id = db.Column(UUID(as_uuid=True), db.ForeignKey("Users.user_id"), nullable=False)
+    senders_github_username = db.Column(db.String(), db.ForeignKey("Users.github_username"), nullable=False)
     name = db.Column(db.String(), nullable=False)
     ssh_key = db.Column(db.String(), nullable=False)
     branches = db.Column(ListType())
@@ -19,9 +19,9 @@ class Repositories(db.Model):
 
     # assigned_sessions = db.relationship('Sessions', secondary=session_repo_xref, back_populates='assigned_repos')
 
-    def __init__(self, repo_id, sender_id, name, ssh_key, branches, active):
+    def __init__(self, repo_id, senders_github_username, name, ssh_key, branches, active):
         self.repo_id = repo_id
-        self.sender_id = sender_id
+        self.senders_github_username = senders_github_username
         self.name = name
         self.ssh_key = ssh_key
         self.branches = branches
@@ -33,9 +33,9 @@ class Repositories(db.Model):
 
 class RepoSchema(ma.Schema):
     class Meta:
-        fields = ['repo_id', 'sender_id', 'name', 'ssh_key', 'branches', 'active']
+        fields = ['repo_id', 'senders_github_username', 'name', 'ssh_key', 'branches', 'active']
 
-        sender_id = ma.fields.Nested(UserSchema)
+        senders_github_username = ma.fields.Nested(UserSchema)
         # assigned_sessions = ma.fields.Nested('SessionSchema', many=True, only=['session_id', 'name', 'active'])
 
 

@@ -16,20 +16,20 @@ def get_all_users():
 
 
 @users.route('/user/<user_id>', methods=['GET'])
-def get_user_by_id(user_id):
-    return controller.get_user_by_id(request, user_id)
+def get_user_by_id(github_username):
+    return controller.get_user_by_github_username(request, github_username)
 
 
-@users.route('/user/<user_id>', methods=["PATCH"])
-def update_user(user_id):
-    return controller.update_user(request, user_id)
+@users.route('/user/<github_username>', methods=["PATCH"])
+def update_user(github_username):
+    return controller.update_user(request, github_username)
 
 
-@users.route('/user/status/<user_id>', methods=["PATCH"])
-def user_activity(user_id):
-    return controller.user_activity(request, user_id)
+@users.route('/user/status/<github_username>', methods=["PATCH"])
+def user_activity(github_username):
+    return controller.user_activity(request, github_username)
 
 
-@users.route('/user/<user_id>', methods=["DELETE"])
-def delete_user(user_id):
-    return controller.delete_user(request, user_id)
+@users.route('/user/<github_username>', methods=["DELETE"])
+def delete_user(github_username):
+    return controller.delete_user(request, github_username)

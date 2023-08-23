@@ -1,5 +1,4 @@
 import marshmallow as ma
-import uuid
 from sqlalchemy.dialects.postgresql import UUID
 
 from db import db
@@ -9,13 +8,13 @@ class Auths(db.Model):
     __tablename__ = "AuthTokens"
 
     github_token = db.Column(db.String(), primary_key=True)
-    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("Users.user_id"), nullable=False)
+    github_username = db.Column(db.String(), db.ForeignKey("Users.github_username"), nullable=False, unique=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
 
-    def __init__(self, github_token, user_id, active):
+    def __init__(self, github_token, github_username, active):
         self.github_token = github_token
-        self.user_id = user_id
-        self.active = active
+        self.github_username = github_username
+        self.active = active if active else True
 
     def new_auth():
         return Auths("", "", True)
@@ -23,9 +22,9 @@ class Auths(db.Model):
 
 class AuthsSchema(ma.Schema):
     class Meta:
-        fields = ['github_token', 'user_id', 'active']
+        fields = ['github_token', 'github_username', 'active']
 
-        user_id = ma.fields.Nested("UserSchema")
+        github_username = ma.fields.Nested("UserSchema")
 
 
 auth_schema = AuthsSchema()

@@ -12,7 +12,7 @@ class Sessions(db.Model):
     __tablename__ = "Sessions"
 
     session_id = db.Column(UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4)
-    receiving_user = db.Column(UUID(as_uuid=True), db.ForeignKey("Users.user_id"), nullable=False)
+    receiving_user = db.Column(db.String(), db.ForeignKey("Users.github_username"), nullable=False)
     name = db.Column(db.String(), nullable=False)
     current_repo_id = db.Column(db.String(), db.ForeignKey("Repositories.repo_id"))
     num_of_commits = db.Column(db.Integer(), default=1, nullable=False)
@@ -43,18 +43,18 @@ class Sessions(db.Model):
 
     # def __repr__(self):
     #     for user in self.users:
-    #         print(f'    {user.user_id} : {user.github_username}')
+    #         print(f'    {user.github_username} : {user.github_username}')
 
     #     return (f"Session Object: \n  session_id: {self.session_id}\n  current_repo: {self.current_repo}\n  repositories: {self.repositories}\n  num_of_commits: {self.num_of_commits}\n  commit_by_repo_ammount: {self.commit_by_repo_amount}\n  time_frame: {self.time_frame}\n  latest_commit: {self.latest_commit}\n  current_position: {self.current_position}\n  active: {self.active}\n  Users:")
 
 
 class SessionSchema(ma.Schema):
     class Meta:
-        fields = ['session_id', 'user_id', 'name', 'current_repo_id', 'num_of_commits', 'commit_by_repo_amount', 'time_frame', 'latest_commit', 'current_position', 'active']
+        fields = ['session_id', 'github_username', 'name', 'current_repo_id', 'num_of_commits', 'commit_by_repo_amount', 'time_frame', 'latest_commit', 'current_position', 'active']
 
-        # users = ma.fields.Nested('UserSchema', many=True, only=['user_id', 'github_username'])
+        # users = ma.fields.Nested('UserSchema', many=True, only=['github_username', 'github_username'])
         # assigned_repos = ma.fields.Nested('RepoSchema', many=True)
-        user_id = ma.fields.Nested("UserSchema")
+        github_username = ma.fields.Nested("UserSchema")
 
 
 session_schema = SessionSchema()

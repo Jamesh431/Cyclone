@@ -20,9 +20,9 @@ def get_all_sessions():
     return controller.get_all_sessions(request)
 
 
-@sessions.route('/sessions/u/<user_id>/<show_all>', methods=["GET"])
-def get_sessions_by_user_id(user_id, show_all):
-    return controller.get_sessions_by_user_id(request, user_id, show_all)
+@sessions.route('/sessions/u/<github_username>/<show_all>', methods=["GET"])
+def get_sessions_by_github_username(github_username, show_all):
+    return controller.get_sessions_by_github_username(request, github_username, show_all)
 
 
 @sessions.route('/sessions/current_repo/<repo_id>', methods=["GET"])

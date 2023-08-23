@@ -20,9 +20,9 @@ def get_auth_by_id(id):
     return controller.get_auth(request, id)
 
 
-@auths.route('/auth/u/<user_id>', methods=['GET'])
-def get_auth_by_user_id(user_id):
-    return controller.get_auth_by_user_id(request, user_id)
+@auths.route('/auth/u/<github_username>', methods=['GET'])
+def get_auth_by_github_username(github_username):
+    return controller.get_auth_by_github_username(request, github_username)
 
 
 @auths.route('/auth/<auth_id>', methods=["PATCH"])

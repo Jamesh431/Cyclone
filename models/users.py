@@ -9,8 +9,7 @@ from db import db
 class Users(db.Model):
     __tablename__ = "Users"
 
-    user_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    github_username = db.Column(db.String(), nullable=False, unique=True)
+    github_username = db.Column(db.String(), primary_key=True, nullable=False, unique=True)
     cyclone_pass = db.Column(db.String(), nullable=False)
     active = db.Column(db.Boolean(), default=True, nullable=False)
 
@@ -25,7 +24,7 @@ class Users(db.Model):
 
 class UserSchema(ma.Schema):
     class Meta:
-        fields = ["user_id", "github_username", "cyclone_pass", "active"]
+        fields = ["github_username", "cyclone_pass", "active"]
 
 
 user_schema = UserSchema()

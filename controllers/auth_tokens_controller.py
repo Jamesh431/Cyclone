@@ -1,33 +1,68 @@
 from flask import request, Request, jsonify
+from flask_bcrypt import generate_password_hash
+from github import Github
 
 from db import db
 from models.auth_tokens import Auths, auth_schema, auths_schema
+from models.users import Users, user_schema
 from util.reflection import populate_obj
 
 
 def add_auth(req: Request):
-    req_data = request.form if request.form else request.json
+    post_data = request.form if request.form else request.json
 
-    fields = ['github_token', 'user_id', 'active']
-    req_fields = ['github_token', 'user_id', 'active']
+    fields = ['github_token', 'github_username', 'cyclone_pass']
+    req_fields = ['github_token', 'github_username', 'cyclone_pass']
     missing_fields = []
 
+    if "cyclone_pass" in post_data:
+        post_data["cyclone_pass"] = generate_password_hash(post_data["cyclone_pass"]).decode("utf8")
+
     for field in fields:
-        field_data = req_data.get(field)
+        field_data = post_data.get(field)
         if field in req_fields and not field_data:
+            if field == "github_token":
+                check_token = db.session.query(Auths).filter(Auths.github_username == post_data["github_username"]).first()
+                if check_token:
+                    continue
             missing_fields.append(field)
+
+    hashed_pass = post_data.pop("cyclone_pass")
+    print(hashed_pass)
+    ####################################################
+    ############## this isn't working yet################
+    ####################################################
 
     if len(missing_fields):
         return jsonify(f"missing required field(s): {missing_fields}", 400)
 
-    new_auth = Auths.new_auth()
+    user_check = db.session.query(Users).filter(Users.github_username == post_data["github_username"]).filter(Users.cyclone_pass == hashed_pass).first()
 
-    populate_obj(new_auth, req_data)
+    print(user_schema.dump(user_check))
 
-    db.session.add(new_auth)
-    db.session.commit()
+    if not user_check:
+        return jsonify({"message": "invalid login"}), 403
 
-    return jsonify({"message": "auth created", "auth": auth_schema.dump(new_auth)}), 201
+    auth_check = db.session.query(Auths).filter(Auths.github_username == post_data["github_username"]).first()
+
+    if not auth_check:
+        new_auth = Auths.new_auth()
+
+        populate_obj(new_auth, post_data)
+
+        auth_check = new_auth
+
+        db.session.add(new_auth)
+        db.session.commit()
+
+    auth_data = auth_schema.dump(auth_check)
+
+    ping_for_verification = Github(auth_data["github_token"]).get_user()
+    if not ping_for_verification.login:
+        return jsonify({"message": "invalid github token"})
+
+    print(ping_for_verification.login)
+    return jsonify({"message": "authorized", "auth": auth_data}), 201
 
 
 def get_all_auths(req: Request):
@@ -48,8 +83,8 @@ def get_auth(req: Request, id):
         return jsonify(auth_schema.dump(auth)), 200
 
 
-def get_auth_by_user_id(req: Request, id):
-    auth = db.session.query(Auths).filter(Auths.user_id == id).first()
+def get_auth_by_github_username(req: Request, id):
+    auth = db.session.query(Auths).filter(Auths.github_username == id).first()
 
     if not auth:
         return jsonify('Auth not found'), 404

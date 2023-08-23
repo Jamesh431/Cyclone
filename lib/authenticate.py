@@ -1,6 +1,8 @@
 import functools
 from flask import Response
 from datetime import datetime
+from github import Github
+import os
 
 from db import db
 from models.auth_tokens import Auths
@@ -51,7 +53,7 @@ def auth(func):
         if not auth_info:
             return fail_response()
 
-        user_object = db.session.query(Users).filter(Users.user_id == auth_info.user_id).first()
+        user_object = db.session.query(Users).filter(Users.github_username == auth_info.github_username).first()
 
         if not user_object.role == "admin":
             return fail_perm_response()

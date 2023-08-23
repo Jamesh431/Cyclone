@@ -15,7 +15,7 @@ def get_all_users():
     return controller.get_users(request)
 
 
-@users.route('/user/<user_id>', methods=['GET'])
+@users.route('/user/<github_username>', methods=['GET'])
 def get_user_by_id(github_username):
     return controller.get_user_by_github_username(request, github_username)
 

@@ -12,6 +12,7 @@ def add_user(req: Request):
     req_fields = ["github_username", "cyclone_pass", "active"]
 
     if "cyclone_pass" in post_data:
+        print(post_data["cyclone_pass"])
         post_data["cyclone_pass"] = generate_password_hash(post_data["cyclone_pass"]).decode("utf8")
 
     missing_fields = []

@@ -28,17 +28,11 @@ def add_auth(req: Request):
             missing_fields.append(field)
 
     hashed_pass = post_data.pop("cyclone_pass")
-    print(hashed_pass)
-    ####################################################
-    ############## this isn't working yet################
-    ####################################################
 
     if len(missing_fields):
         return jsonify(f"missing required field(s): {missing_fields}", 400)
 
-    user_check = db.session.query(Users).filter(Users.github_username == post_data["github_username"]).filter(Users.cyclone_pass == hashed_pass).first()
-
-    print(user_schema.dump(user_check))
+    user_check = db.session.query(Users).filter(Users.github_username == post_data["github_username"] and Users.cyclone_pass == hashed_pass).first()
 
     if not user_check:
         return jsonify({"message": "invalid login"}), 403
@@ -57,11 +51,12 @@ def add_auth(req: Request):
 
     auth_data = auth_schema.dump(auth_check)
 
-    ping_for_verification = Github(auth_data["github_token"]).get_user()
-    if not ping_for_verification.login:
-        return jsonify({"message": "invalid github token"})
+    try:
+        ping_for_verification = Github(auth_data["github_token"]).get_user()
+        print(ping_for_verification.login)
+    except:
+        return jsonify({"message": "invalid github token"}), 401
 
-    print(ping_for_verification.login)
     return jsonify({"message": "authorized", "auth": auth_data}), 201
 
 

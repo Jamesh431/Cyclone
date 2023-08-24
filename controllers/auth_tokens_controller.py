@@ -53,7 +53,7 @@ def add_auth(req: Request):
 
     try:
         ping_for_verification = Github(auth_data["github_token"]).get_user()
-        print(ping_for_verification.login)
+        print(ping_for_verification)
     except:
         return jsonify({"message": "invalid github token"}), 401
 

@@ -7,7 +7,7 @@ from db import db
 class Auths(db.Model):
     __tablename__ = "AuthTokens"
 
-    github_token = db.Column(db.String(), primary_key=True)
+    github_token = db.Column(db.String(), primary_key=True, unique=True)
     github_username = db.Column(db.String(), db.ForeignKey("Users.github_username"), nullable=False)
     active = db.Column(db.Boolean(), default=True, nullable=False)
 

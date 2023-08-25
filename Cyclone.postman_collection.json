@@ -1,0 +1,899 @@
+{
+  "info": {
+    "_postman_id": "fcc82c65-dfd3-4197-8e74-70993f4057b3",
+    "name": "Cyclone",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "29150200"
+  },
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Add User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response  = pm.response.json();",
+                  "",
+                  "pm.collectionVariables.set(\"cyclone_github_username\", response.user.github_username);",
+                  "",
+                  "pm.collectionVariables.set(\"cyclone_pass\", response.user.cyclone_pass);",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"github_username\": \"Your github username\",\n    \"cyclone_pass\": \"123\",\n    \"active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8086/user",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["user"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/users",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User by Github Username",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/user/{{cyclone_github_username}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["user", "{{cyclone_github_username}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response  = pm.response.json();",
+                  "",
+                  "pm.collectionVariables.set(\"cyclone_github_username\", response.github_username);",
+                  "",
+                  "pm.collectionVariables.set(\"cyclone_pass\", response.cyclone_pass);",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"github_username\": \"username\",\n    \"cyclone_pass\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8086/user/{{cyclone_github_username}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["user", "{{cyclone_github_username}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Activate/Deactivate User",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/user/status/{{cyclone_github_username}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["user", "status", "{{cyclone_github_username}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/user/{{cyclone_user_id}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["user", "{{cyclone_user_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auths",
+      "item": [
+        {
+          "name": "Add Auth",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response  = pm.response.json();",
+                  "",
+                  "pm.collectionVariables.set(\"cyclone_github_user_info\", [response.auth.github_token, response.auth.github_username]);",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "github_token",
+                "value": "{{cyclone_github_token}}",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "github_username",
+                "value": "{{cyclone_github_username}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"github_token\": \"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\", \n    \"github_username\": \"{{cyclone_github_username}}\",\n    \"cyclone_pass\": \"123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8086/auth",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["auth"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all Auths",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/my-auths",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["my-auths"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/auth/{{cyclone_github_token}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["auth", "{{cyclone_github_token}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get by Github Username",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8086/auth/u/{{cyclone_github_username}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["auth", "u", "{{cyclone_github_username}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"active\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8086/auth/{{cyclone_github_token}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["auth", "{{cyclone_github_token}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/auth/{{cyclone_github_token}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["auth", "{{cyclone_github_token}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Repositories",
+      "item": [
+        {
+          "name": "Add Repo",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response  = pm.response.json();",
+                  "",
+                  "pm.collectionVariables.set(\"cyclone_repo_id\", response.repository.repo_id);",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"repo_id\": \"repo id from github here\",\n    \"senders_github_username\": \"{{cyclone_github_username}}\",\n    \"name\": \"{{$randomLoremWords}}\",\n    \"active\": true,\n    \"ssh_key\": \"1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8086/repo",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["repo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Repo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/repo/{{cyclone_repo_id}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["repo", "{{cyclone_repo_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all Repos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/repos",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["repos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Repo by Senders Github Username",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/repo/sender/{{cyclone_github_username}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["repo", "sender", "{{cyclone_github_username}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Repo Search",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/repo/search?q=enter-generated-latin-word-here",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["repo", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "enter-generated-latin-word-here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Active Repos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/repos/active",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["repos", "active"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Repo",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"{{$randomLoremWords}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8086/repo/{{cyclone_repo_id}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["repo", "{{cyclone_repo_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Activate/Deactivate Repo",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/repo/status/{{cyclone_repo_id}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["repo", "status", "{{cyclone_repo_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Repo",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/repo/{{cyclone_repo_id}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["repo", "{{cyclone_repo_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Commits",
+      "item": [
+        {
+          "name": "Add Commit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response  = pm.response.json();",
+                  "",
+                  "pm.collectionVariables.set(\"cyclone_commit_id\", response.commit.commit_id);",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"commit_id\": \"commit_id from github here\",\n    \"repo_id\": \"{{cyclone_repo_id}}\",\n    \"comment\": \"{{$randomLoremWords}}\",\n    \"position\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8086/commit",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["commit"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/commits",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["commits"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/commit/{{cyclone_commit_id}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["commit", "{{cyclone_commit_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get by Repo id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/commit/{{cyclone_repo_id}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["commit", "{{cyclone_repo_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Commit",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"comment\": \"{{$randomLoremWords}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8086/commit/{{cyclone_commit_id}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["commit", "{{cyclone_commit_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/commit/{{cyclone_commit_id}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["commit", "{{cyclone_commit_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Sessions",
+      "item": [
+        {
+          "name": "Add Session",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response  = pm.response.json();",
+                  "",
+                  "pm.collectionVariables.set(\"cyclone_session_id\", response.session.session_id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "        {\n            \"current_repo_id\": \"{{cyclone_repo_id}}\",\n            \"num_of_commits\":3,\n            \"receiving_user\":\"{{cyclone_user_id}}\",\n            \"commit_by_repo_amount\": false,\n            \"time_frame\":{\"8:17\":\"8:17\"},\n            \"current_position\":0,\n            \"active\":true,\n            \"repositories\": [\"{{cyclone_repo_id}}\"]\n        } // repositories should be a list of repository ids when creating/editing a session",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8086/session",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["session"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Session",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/session/{{cyclone_session_id}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["session", "{{cyclone_session_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/sessions",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["sessions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Github Username",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/sessions/u/{{cyclone_github_username}}/all",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["sessions", "u", "{{cyclone_github_username}}", "all"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Active by Github Username",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/sessions/u/{{cyclone_github_username}}/active",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["sessions", "u", "{{cyclone_github_username}}", "active"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get by Current Repo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/sessions/current_repo/{{cyclone_repo_id}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["sessions", "current_repo", "{{cyclone_repo_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get by Repo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/sessions/repo/{{cyclone_repo_id}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["sessions", "repo", "{{cyclone_repo_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Session",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"add_repositories\": [\"{{cyclone_repo_id}}\"],\n    \"delete_repositories\": [\"{{cyclone_repo_id}}\"]\n} // to test, create new repo, then in this file remove line 3 and the comma on line 2, add that repo, then add back line 3, remove line 2 and then remove that repo\n// can also add and remove different repos in one call",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8086/session/{{cyclone_session_id}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["session", "{{cyclone_session_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Activate/Deactivate Session",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"add_repositories\": [\"bdcdf6ca-be1d-4982-94b9-38556698a1dd\"],\n    \"delete_repositories\": [\"bdcdf6ca-be1d-4982-94b9-38556698a1dd\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8086/session/status/{{cyclone_session_id}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["session", "status", "{{cyclone_session_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Session",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:8086/session/{{cyclone_session_id}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8086",
+              "path": ["session", "{{cyclone_session_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "value",
+        "value": "{{cyclone_github_user_info}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      },
+      {
+        "key": "key",
+        "value": "github_info",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "user_id",
+      "value": ""
+    },
+    {
+      "key": "cyclone_github_username",
+      "value": ""
+    },
+    {
+      "key": "cyclone_repo_id",
+      "value": ""
+    },
+    {
+      "key": "cyclone_session_id",
+      "value": ""
+    },
+    {
+      "key": "cyclone_commit_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cyclone_github_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cyclone_pass",
+      "value": ""
+    },
+    {
+      "key": "cyclone_github_userinfo",
+      "value": ""
+    },
+    {
+      "key": "cyclone_github_user_info",
+      "value": ""
+    }
+  ]
+}

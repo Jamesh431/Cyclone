@@ -5,6 +5,7 @@ from models.sessions import Sessions, session_schema, sessions_schema
 from models.repositories import Repositories, repos_schema
 from models.session_repo_xref import SessionRepoXref
 from util.reflection import populate_obj
+from lib.authenticate import *
 
 
 @auth

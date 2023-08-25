@@ -4,6 +4,7 @@ from flask_bcrypt import generate_password_hash
 from db import db
 from models.users import Users, user_schema, users_schema
 from util.reflection import populate_obj
+from lib.authenticate import *
 
 
 def add_user(req: Request):
@@ -43,7 +44,7 @@ def get_users(req: Request, auth_info):
 
 
 @auth
-def get_user_by_github_username(req: Request, github_username):
+def get_user_by_github_username(req: Request, github_username, auth_info):
     user = db.session.query(Users).filter(Users.github_username == github_username).first()
     if user:
         return jsonify(user_schema.dump(user)), 200

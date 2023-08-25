@@ -47,13 +47,12 @@ def add_auth(req: Request):
 
         auth_check = new_auth
 
-        db.session.add(new_auth)
-        db.session.commit()
-
     auth_data = auth_schema.dump(auth_check)
 
     try:
         Github(auth_data["github_token"]).get_user(auth_data["github_username"])
+        db.session.add(new_auth)
+        db.session.commit()
     except:
         return jsonify({"message": "invalid github token"}), 401
 

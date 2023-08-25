@@ -1,6 +1,4 @@
 import marshmallow as ma
-import uuid
-from sqlalchemy.dialects.postgresql import UUID
 
 from db import db
 # from .user_sessions_xref import user_sessions_xref

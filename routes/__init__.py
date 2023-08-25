@@ -1,4 +1,3 @@
-# from .auth_routes import auth
 from .user_routes import users
 from .auth_routes import auths
 from .repository_routes import repos

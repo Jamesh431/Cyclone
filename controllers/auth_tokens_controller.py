@@ -4,7 +4,7 @@ from github import Github
 
 from db import db
 from models.auth_tokens import Auths, auth_schema, auths_schema
-from models.users import Users, user_schema
+from models.users import Users
 from util.reflection import populate_obj
 from lib.authenticate import *
 

@@ -1,11 +1,9 @@
-# use response 202 for successful session creation if start time is not now ?
 from flask import request, Request, jsonify
-# from sqlalchemy.orm import aliased
 
 from db import db
 from models.sessions import Sessions, session_schema, sessions_schema
 from models.repositories import Repositories, repos_schema
-from models.session_repo_xref import SessionRepoXref, session_repo_xrefs
+from models.session_repo_xref import SessionRepoXref
 from util.reflection import populate_obj
 
 

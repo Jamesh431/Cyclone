@@ -35,12 +35,14 @@ def add_user(req: Request):
     return jsonify({"message": "user created", "user": user_schema.dump(new_user)}), 201
 
 
-def get_users(req: Request):
+@auth
+def get_users(req: Request, auth_info):
     users = db.session.query(Users).all()
 
     return jsonify(users_schema.dump(users)), 200
 
 
+@auth
 def get_user_by_github_username(req: Request, github_username):
     user = db.session.query(Users).filter(Users.github_username == github_username).first()
     if user:
@@ -49,7 +51,8 @@ def get_user_by_github_username(req: Request, github_username):
     return jsonify("User Not Found"), 404
 
 
-def update_user(req: Request, github_username):
+@auth
+def update_user(req: Request, github_username, auth_info):
     patch_data = request.json
     if not patch_data:
         patch_data = request.form
@@ -67,7 +70,8 @@ def update_user(req: Request, github_username):
     return jsonify(user_schema.dump(user)), 201
 
 
-def delete_user(req: Request, github_username):
+@auth
+def delete_user(req: Request, github_username, auth_info):
     user = db.session.query(Users).filter(Users.github_username == github_username).first()
 
     if user:
@@ -78,7 +82,8 @@ def delete_user(req: Request, github_username):
         return jsonify({"message": "user not found"}), 404
 
 
-def user_activity(req: Request, github_username):
+@auth
+def user_activity(req: Request, github_username, auth_info):
     user = db.session.query(Users).filter(Users.github_username == github_username).first()
 
     if not user:

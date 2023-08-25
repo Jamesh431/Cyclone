@@ -9,7 +9,8 @@ from models.session_repo_xref import SessionRepoXref, session_repo_xrefs
 from util.reflection import populate_obj
 
 
-def add_session(req: Request):
+@auth
+def add_session(req: Request, auth_info):
     post_data = request.form if request.form else request.json
 
     fields = ['session_id', 'receiving_user', 'name', 'current_repo_id', 'num_of_commits', 'commit_by_repo_amount', 'start_time', 'end_time', 'latest_commit', 'current_position', 'active', 'assigned_repos']
@@ -70,7 +71,8 @@ def add_session(req: Request):
     return jsonify({"message": "session created", "session": session_data}), 201
 
 
-def get_all_sessions(req: Request):
+@auth
+def get_all_sessions(req: Request, auth_info):
     sessions = db.session.query(Sessions).all()
 
     if not sessions:
@@ -79,7 +81,8 @@ def get_all_sessions(req: Request):
         return jsonify(sessions_schema.dump(sessions)), 200
 
 
-def get_session(req: Request, id):
+@auth
+def get_session(req: Request, id, auth_info):
     session = db.session.query(Sessions).filter(Sessions.session_id == id).first()
 
     if not session:
@@ -88,7 +91,8 @@ def get_session(req: Request, id):
         return jsonify(session_schema.dump(session)), 200
 
 
-def get_sessions_by_github_username(req: Request, github_username, show_all):
+@auth
+def get_sessions_by_github_username(req: Request, github_username, show_all, auth_info):
     sessions = None
 
     if show_all == "all":
@@ -102,7 +106,8 @@ def get_sessions_by_github_username(req: Request, github_username, show_all):
         return jsonify(sessions_schema.dump(sessions)), 200
 
 
-def get_sessions_by_current_repo_id(req: Request, id):
+@auth
+def get_sessions_by_current_repo_id(req: Request, id, auth_info):
     sessions = db.session.query(Sessions).filter(Sessions.current_repo_id == id).all()
 
     if not sessions:
@@ -111,7 +116,8 @@ def get_sessions_by_current_repo_id(req: Request, id):
         return jsonify(sessions_schema.dump(sessions)), 200
 
 
-def get_sessions_by_repo_id(req: Request, id):
+@auth
+def get_sessions_by_repo_id(req: Request, id, auth_info):
 
     join_sessions_query = db.session.query(Sessions).join(SessionRepoXref, Sessions.session_id == SessionRepoXref.session_id).filter(SessionRepoXref.repo_id == id).all()
 
@@ -141,7 +147,8 @@ def get_sessions_by_repo_id(req: Request, id):
 #     return jsonify(session_schema.dump(session)), 201
 
 
-def update_session(req: Request, id):
+@auth
+def update_session(req: Request, id, auth_info):
     post_data = request.json
     if not post_data:
         post_data = request.form
@@ -207,7 +214,8 @@ def update_session(req: Request, id):
     return jsonify({"message": "session updated", "session": session_data}), 201
 
 
-def delete_session(req: Request, id):
+@auth
+def delete_session(req: Request, id, auth_info):
     session = db.session.query(Sessions).filter(Sessions.session_id == id).first()
 
     if session:
@@ -225,7 +233,8 @@ def delete_session(req: Request, id):
         return jsonify({"message": "session not found"}), 404
 
 
-def session_activity(req: Request, id):
+@auth
+def session_activity(req: Request, id, auth_info):
     session = db.session.query(Sessions).filter(Sessions.session_id == id).first()
 
     if not session:

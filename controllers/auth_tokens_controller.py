@@ -6,6 +6,7 @@ from db import db
 from models.auth_tokens import Auths, auth_schema, auths_schema
 from models.users import Users, user_schema
 from util.reflection import populate_obj
+from lib.authenticate import *
 
 
 def add_auth(req: Request):
@@ -52,16 +53,16 @@ def add_auth(req: Request):
     auth_data = auth_schema.dump(auth_check)
 
     try:
-        ping_for_verification = Github(auth_data["github_token"]).get_user()
-        print(ping_for_verification)
+        Github(auth_data["github_token"]).get_user(auth_data["github_username"])
     except:
         return jsonify({"message": "invalid github token"}), 401
 
     return jsonify({"message": "authorized", "auth": auth_data}), 201
 
 
-def get_all_auths(req: Request):
-    auths = db.session.query(Auths).all()
+@auth_with_return
+def get_all_my_auths(req: Request, auth_info):
+    auths = db.session.query(Auths).filter(Auths.github_username == auth_info.github_username).all()
 
     if not auths:
         return jsonify('No Auths found'), 404
@@ -69,7 +70,8 @@ def get_all_auths(req: Request):
         return jsonify(auths_schema.dump(auths)), 200
 
 
-def get_auth(req: Request, id):
+@auth
+def get_auth(req: Request, id, auth_info):
     auth = db.session.query(Auths).filter(Auths.github_token == id).first()
 
     if not auth:
@@ -78,7 +80,8 @@ def get_auth(req: Request, id):
         return jsonify(auth_schema.dump(auth)), 200
 
 
-def get_auth_by_github_username(req: Request, id):
+@auth
+def get_auth_by_github_username(req: Request, id, auth_info):
     auth = db.session.query(Auths).filter(Auths.github_username == id).first()
 
     if not auth:
@@ -87,7 +90,8 @@ def get_auth_by_github_username(req: Request, id):
         return jsonify(auth_schema.dump(auth)), 200
 
 
-def update_auth(req: Request, id):
+@auth
+def update_auth(req: Request, id, auth_info):
     post_data = request.json
     if not post_data:
         post_data = request.form
@@ -102,7 +106,8 @@ def update_auth(req: Request, id):
         return jsonify(auth_schema.dump(auth)), 201
 
 
-def delete_auth(req: Request, id):
+@auth
+def delete_auth(req: Request, id, auth_info):
     auth = db.session.query(Auths).filter(Auths.github_token == id).first()
 
     if auth:
@@ -113,7 +118,8 @@ def delete_auth(req: Request, id):
         return jsonify({"message": "Auth not found"}), 404
 
 
-def auth_activity(req: Request, id):
+@auth
+def auth_activity(req: Request, id, auth_info):
     auth = db.session.query(Auths).filter(Auths.github_token == id).first()
 
     if not auth:

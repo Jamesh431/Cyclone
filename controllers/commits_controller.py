@@ -5,9 +5,11 @@ from models.commits import Commits, commit_schema, commits_schema
 from models.repositories import repo_schema
 from models.repositories import Repositories
 from util.reflection import populate_obj
+from lib.authenticate import *
 
 
-def add_commit(req: Request):
+@auth
+def add_commit(req: Request, auth_info):
     post_data = request.form if request.form else request.json
 
     fields = ["commit_id", "repo_id", "comment", "position"]
@@ -43,7 +45,8 @@ def add_commit(req: Request):
     return jsonify({"message": "commit created", "commit": commit_data}), 201
 
 
-def get_all_commits(req: Request):
+@auth
+def get_all_commits(req: Request, auth_info):
     commits = db.session.query(Commits).all()
 
     if not commits:
@@ -52,7 +55,8 @@ def get_all_commits(req: Request):
         return jsonify(commits_schema.dump(commits)), 200
 
 
-def get_commit(req: Request, id):
+@auth
+def get_commit(req: Request, id, auth_info):
     commit = db.session.query(Commits).filter(Commits.commit_id == id).first()
 
     if not commit:
@@ -61,7 +65,8 @@ def get_commit(req: Request, id):
         return jsonify(commit_schema.dump(commit)), 200
 
 
-def get_commits_by_repo_id(req: Request, id):
+@auth
+def get_commits_by_repo_id(req: Request, id, auth_info):
     commits = db.session.query(Commits).filter(Commits.repo_id == id).all()
 
     if not commits:
@@ -70,7 +75,8 @@ def get_commits_by_repo_id(req: Request, id):
         return jsonify(commits_schema.dump(commits)), 200
 
 
-def update_commit(req: Request, id):
+@auth
+def update_commit(req: Request, id, auth_info):
     post_data = request.json
     if not post_data:
         post_data = request.form
@@ -86,7 +92,8 @@ def update_commit(req: Request, id):
     return jsonify(commit_schema.dump(commit)), 201
 
 
-def delete_commit(req: Request, id):
+@auth
+def delete_commit(req: Request, id, auth_info):
     commit = db.session.query(Commits).filter(Commits.commit_id == id).first()
 
     if commit:

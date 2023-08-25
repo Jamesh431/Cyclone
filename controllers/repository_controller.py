@@ -3,9 +3,11 @@ from flask import request, Request, jsonify
 from db import db
 from models.repositories import Repositories, repo_schema, repos_schema
 from util.reflection import populate_obj
+from lib.authenticate import *
 
 
-def add_repository(req: Request):
+@auth
+def add_repository(req: Request, auth_info):
     req_data = request.form if request.form else request.json
     fields = ["senders_github_username", "name", "ssh_key", "branches", "active"]
     req_fields = ["senders_github_username", "name", "ssh_key", "active"]
@@ -29,7 +31,8 @@ def add_repository(req: Request):
     return jsonify({"message": "repository created", "repository": repo_schema.dump(new_repository)}), 201
 
 
-def get_all_repositories(req: Request):
+@auth
+def get_all_repositories(req: Request, auth_info):
     all_repositories = db.session.query(Repositories).all()
 
     if all_repositories:
@@ -38,7 +41,8 @@ def get_all_repositories(req: Request):
         return jsonify({"message": "repositories not found"}), 404
 
 
-def get_active_repositories(req: Request):
+@auth
+def get_active_repositories(req: Request, auth_info):
     active_repositories = db.session.query(Repositories).filter(Repositories.active == True).all()
 
     if active_repositories:
@@ -47,7 +51,8 @@ def get_active_repositories(req: Request):
         return jsonify({"message": "repositories not found"}), 404
 
 
-def get_repository(req: Request, id):
+@auth
+def get_repository(req: Request, id, auth_info):
     repository = db.session.query(Repositories).filter(Repositories.repo_id == id).first()
 
     if repository:
@@ -56,7 +61,8 @@ def get_repository(req: Request, id):
         return jsonify({"message": "repository not found"}), 404
 
 
-def get_repository_by_search(req: Request):
+@auth
+def get_repository_by_search(req: Request, auth_info):
     formatted_search = req.args.get('q').lower()
 
     search_query = db.session.query(Repositories).filter(db.or_(db.func.lower(Repositories.name).contains(formatted_search)))
@@ -66,7 +72,8 @@ def get_repository_by_search(req: Request):
     return jsonify({"message": "results", "repositories": repos_schema.dump(search_data)}), 200
 
 
-def get_repositories_by_senders_github_username(req: Request, id):
+@auth
+def get_repositories_by_senders_github_username(req: Request, id, auth_info):
     senders_repositories = db.session.query(Repositories).filter(Repositories.senders_github_username == id).all()
 
     if senders_repositories:
@@ -75,7 +82,8 @@ def get_repositories_by_senders_github_username(req: Request, id):
         return jsonify({"message": "repositories not found"}), 404
 
 
-def update_repository(req: Request, id):
+@auth
+def update_repository(req: Request, id, auth_info):
     patch_data = request.json
     if not patch_data:
         patch_data = request.form
@@ -91,7 +99,8 @@ def update_repository(req: Request, id):
     return jsonify({"message": "repostory updated", "repository": repo_schema.dump(repository_data)}), 200
 
 
-def delete_repository(req: Request, id):
+@auth
+def delete_repository(req: Request, id, auth_info):
     expunged_repository = db.session.query(Repositories).filter(Repositories.repo_id == id).first()
 
     if not expunged_repository:
@@ -103,7 +112,8 @@ def delete_repository(req: Request, id):
     return jsonify({"message": "repository deleted"}), 200
 
 
-def repository_activity(req: Request, id):
+@auth
+def repository_activity(req: Request, id, auth_info):
     repository = db.session.query(Repositories).filter(Repositories.repo_id == id).first()
 
     if not repository:

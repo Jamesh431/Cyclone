@@ -16,3 +16,14 @@ PyGit
 
 See here for sqlalchemy-utils docs:
 https://sqlalchemy-utils.readthedocs.io/en/latest/data_types.html#module-sqlalchemy_utils.types.json
+
+
+
+To run:
+git clone
+python3 -m pipenv install
+python3 -m pipenv shell
+use postman in repo
+run through CRUD operations (work flow is add user -> add auth -> back to users -> back to auth -> Full CRUD on Repositories -> -Commits -> Sessions)
+
+Pulling and commiting to github with this application is not yet implimented

@@ -10,9 +10,9 @@ def add_authorization():
     return controller.add_auth(request)
 
 
-@auths.route("/auths", methods=["GET"])
-def get_all_auths():
-    return controller.get_all_auths(request)
+@auths.route("/my-auths", methods=["GET"])
+def get_all_my_auths():
+    return controller.get_all_my_auths(request)
 
 
 @auths.route("/auth/<id>", methods=["GET"])

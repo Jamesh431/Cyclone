@@ -9,21 +9,6 @@ from models.auth_tokens import Auths
 from models.users import Users
 
 
-def validate_token(args):
-    auth_token = args.headers['auth']
-
-    if not auth_token:
-        return False
-
-    existing_token = db.session.query(Auths).filter(Auths.auth_token == auth_token).first()
-
-    if existing_token:
-        if existing_token.expiration > datetime.now():
-            return existing_token
-    else:
-        return False
-
-
 def fail_response():
     return Response("Authentication Required", 401)
 
@@ -32,34 +17,42 @@ def fail_perm_response():
     return Response("Invalid GitHub Token", 403)
 
 
+def validate_github_token(args):
+    github_info = args.headers['github_info'].split(",")
+    github_token = github_info[0]
+    github_username = github_info[1]
+
+    auth_check = db.session.query(Auths).filter(Auths.github_token == github_token).first()
+
+    if not auth_check:
+        return False
+
+    try:
+        Github(github_token).get_user(github_username)
+        return auth_check
+    except:
+        db.session.delete(auth_check)
+        db.session.commit()
+        return fail_perm_response()
+
+
 def auth_with_return(func):
     @functools.wraps(func)
     def wrapper_auth_return(*args, **kwargs):
-        auth_info = validate_token(args[0])
+        auth_info = validate_github_token(args[0])
+        kwargs["auth_info"] = auth_info
 
-        if auth_info:
-            kwargs["auth_info"] = auth_info
-            return func(*args, **kwargs)
-        else:
-            return fail_response()
+        return func(*args, **kwargs) if auth_info else fail_response()
+
     return wrapper_auth_return
 
 
 def auth(func):
     @functools.wraps(func)
     def wrapper_auth_return(*args, **kwargs):
-        auth_info = validate_token(args[0])
+        auth_info = validate_github_token(args[0])
+        kwargs["auth_info"] = auth_info
 
-        if not auth_info:
-            return fail_response()
+        return func(*args, **kwargs) if auth_info else fail_response()
 
-        user_object = db.session.query(Users).filter(Users.github_username == auth_info.github_username).first()
-
-        if not user_object.role == "admin":
-            return fail_perm_response()
-
-        if auth_info:
-            return func(*args, **kwargs)
-        else:
-            return fail_perm_response()
     return wrapper_auth_return

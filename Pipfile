@@ -15,7 +15,7 @@ flask-marshmallow = "==0.14.0"
 marshmallow-sqlalchemy = "==0.24.2"
 MarkupSafe = "==1.1.1"
 flask-bcrypt = "*"
-pygit = "*"
+pygithub = "*"
 
 [dev-packages]
 

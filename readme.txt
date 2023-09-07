@@ -11,7 +11,7 @@ flask-marshmallow
 marshmallow-sqlalchemy
 MarkupSafe
 flask-bcrypt
-PyGit
+PyGithub
 
 
 See here for sqlalchemy-utils docs:

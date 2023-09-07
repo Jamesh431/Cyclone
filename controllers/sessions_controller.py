@@ -2,7 +2,7 @@ from flask import request, Request, jsonify
 
 from db import db
 from models.sessions import Sessions, session_schema, sessions_schema
-from models.repositories import Repositories, repos_schema
+from models.repositories import Repositories, repos_schema, repo_schema
 from models.session_repo_xref import SessionRepoXref
 from util.reflection import populate_obj
 from lib.authenticate import *
@@ -83,11 +83,23 @@ def get_all_sessions(req: Request, auth_info):
 @auth
 def get_session(req: Request, id, auth_info):
     session = db.session.query(Sessions).filter(Sessions.session_id == id).first()
+    session_data = session_schema.dump(session)
+    linked_repos = db.session.query(SessionRepoXref).join(Sessions, SessionRepoXref.session_id == Sessions.session_id).all()
+    repos_data = repos_schema.dump(linked_repos)
+
+    repos_list = []
+
+    for repo in repos_data:
+
+        repository = db.session.query(Repositories).filter(Repositories.repo_id == repo["repo_id"]).first()
+        repos_list.append(repo_schema.dump(repository))
+
+    session_data["repositories"] = repos_list
 
     if not session:
         return jsonify('session not found'), 404
     else:
-        return jsonify(session_schema.dump(session)), 200
+        return jsonify(session_data), 200
 
 
 @auth
@@ -204,7 +216,7 @@ def update_session(req: Request, id, auth_info):
 
         db.session.commit()
 
-        linked_repos = db.session.query(Repositories).filter(Repositories.repo_id.in_(assigned_repos)).all()
+        linked_repos = db.session.query(Sessions).join(SessionRepoXref, Sessions.session_id == SessionRepoXref.session_id).all()
 
         session_data["repositories"] = repos_schema.dump(linked_repos)
 

@@ -68,6 +68,7 @@ def get_commit(req: Request, id, auth_info):
 @auth
 def get_commits_by_repo_id(req: Request, id, auth_info):
     commits = db.session.query(Commits).filter(Commits.repo_id == id).all()
+    print(commits_schema.dump(commits))
 
     if not commits:
         return jsonify('commits not found'), 404
